@@ -10,14 +10,20 @@ import {
   MapPin,
   Search,
 } from 'lucide-react';
-import './App.css';
+import ClientDashboard from './components/ClientDashboard.js';
+import LoginView from './components/LoginView.js';
+import RegisterView from './components/RegisterView.js';
+import AdminDashboard from './components/AdminDashboard.js';
+import './styles/App.css';
+
+/* ------------------- MAIN APP ------------------- */
 
 export default function ClassBookingApp() {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
-  const [classes, setClasses] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [view, setView] = useState('login');
+  const [classes, setClasses] = useState([]);
 
   const handleLogin = async (userData) => {
     const { email, password, isAdmin } = userData;
@@ -68,31 +74,57 @@ export default function ClassBookingApp() {
     }
   };
 
-  // Fetch classes on component mount
-  /*useEffect(() => {
+  //Fetch classes on component mount
+  useEffect(() => {
     const fetchClasses = async () => {
       const res = await fetch('http://localhost:4000/api/classes');
       const data = await res.json();
       setClasses(data);
     };
     fetchClasses();
-  }, []);-->*/
+  }, []);
 
   const handleBookClass = (classId) => {
+    // Check if user has tokens
+    if (currentUser.tokens < 1) {
+      return { success: false, message: 'Not enough tokens! Please purchase more.' };
+    }
+
+    // Deduct token
+    const updatedUser = { ...currentUser, tokens: currentUser.tokens - 1 };
+    setCurrentUser(updatedUser);
+
+    // Update user in users array
+    setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
+
+    // Create booking
     const newBooking = {
       id: Date.now(),
       classId,
       userId: currentUser.id,
       bookedAt: new Date().toISOString(),
+      tokensUsed: 1
     };
     setBookings([...bookings, newBooking]);
+
+    return { success: true, message: 'Class booked successfully! 1 token used.' };
+  };
+
+  const handlePurchaseTokens = (amount) => {
+    const updatedUser = { ...currentUser, tokens: currentUser.tokens + amount };
+    setCurrentUser(updatedUser);
+    setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
+    return true;
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     setView('login');
   };
-
+  const handleDeleteClass = (classId) => {
+    setClasses(classes.filter(c => c.id !== classId));
+    setBookings(bookings.filter(b => b.classId !== classId));
+  };
   return (
     <div className="app-background">
       {view === 'login' && (
@@ -114,6 +146,7 @@ export default function ClassBookingApp() {
           users={users}
           bookings={bookings}
           onCreateClass={handleCreateClass}
+          onDeleteClass={handleDeleteClass}
           onLogout={handleLogout}
           onViewChange={setView}
         />
@@ -124,6 +157,7 @@ export default function ClassBookingApp() {
           classes={classes}
           bookings={bookings}
           onBookClass={handleBookClass}
+          onPurchaseTokens={handlePurchaseTokens}
           onLogout={handleLogout}
         />
       )}
@@ -138,204 +172,12 @@ export default function ClassBookingApp() {
   );
 }
 
-/* ------------------- LOGIN ------------------- */
-function LoginView({ onLogin, onSwitchToRegister }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const success = await onLogin({ email, password, isAdmin });
-    if (!success) setError('Invalid credentials or role');
 
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, isAdmin }),
-      });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || 'Login failed')
-      return;
 
-      // Pass token and user to parent
-      localStorage.setItem('token', data.token);
-      onLogin(data.user);
-      setError('');
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  return (
-    <div className="auth-container">
-      <div className="auth-box">
-        <div className="auth-header">
-          <Calendar className="icon-large" />
-          <h1>Class Booking System</h1>
-          <p>Login to manage or book classes</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
-          <div className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={isAdmin}
-              onChange={(e) => setIsAdmin(e.target.checked)}
-            />
-            <label>Login as Administrator</label>
-          </div>
-
-          {error && <p className="error-text">{error}</p>}
-
-          <button type="submit" className="btn-primary">
-            <LogIn className="icon-small" /> Login
-          </button>
-        </form>
-
-        <div className="switch-auth">
-          <button onClick={onSwitchToRegister}>
-            Don’t have an account? Register here
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------- REGISTER ------------------- */
-function RegisterView({ onRegister, onSwitchToLogin }) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    isAdmin: isAdmin
-  });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || 'Registration failed');
-
-      setSuccess(true);
-      setError('');
-
-      setTimeout(() => {
-        onSwitchToLogin();
-      }, 1500);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  return (
-    <div className="auth-container">
-      <div className="auth-box">
-        <h2>Create Account</h2>
-        {success ? (
-          <div className="success-box">
-            Account created successfully! Redirecting to login...
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="auth-form">
-            <label>Full Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
-            />
-
-            <label>Email</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-            />
-
-            <label>Phone</label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              required
-            />
-
-            <label>Password</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              required
-            />
-
-            <div className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={formData.isAdmin}
-                onChange={(e) => setIsAdmin(e.target.checked)}
-
-              />
-              <label>Register as Administrator</label>
-            </div>
-
-            <button type="submit" className="btn-primary">
-              Register
-            </button>
-          </form>
-        )}
-        <div className="switch-auth">
-          <button onClick={onSwitchToLogin}>
-            Already have an account? Login here
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /* ------------------- ADMIN DASHBOARD ------------------- */
-function AdminDashboard({
+/*function AdminDashboard({
   currentUser,
   onLogout,
   onViewChange,
@@ -491,57 +333,50 @@ function AdminDashboard({
   );
 }
 
-/* ------------------- CLIENT DASHBOARD ------------------- */
-function ClientDashboard({ currentUser, classes, bookings, onBookClass, onLogout }) {
+
+/* ------------------- CALENDAR VIEW ------------------- */
+function CalendarView({ classes, bookings, onBack }) {
+  const [classes2, setClasses] = useState([]);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const res = await fetch('http://localhost:4000/api/classes');
+        const data = await res.json();
+        setClasses(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchClasses();
+  }, []);
+
   return (
     <div className="dashboard">
       <header className="dashboard-header">
         <h1>
-          <User className="icon-small" /> Hi, {currentUser.name}
+          <Calendar className="icon-small" /> Class Calendar
         </h1>
-        <button className="btn-danger" onClick={onLogout}>
-          <LogOut className="icon-small" /> Logout
+        <button className="btn-secondary" onClick={onBack}>
+          Back
         </button>
       </header>
 
       <section className="dashboard-section">
-        <h2>Available Classes</h2>
+        <h2>Existing Classes</h2>
         <div className="card-grid">
-          {classes.map((c) => (
+          {classes2.map((c) => (
             <div key={c.id} className="card">
-              <h3>{c.name}</h3>
-              <p>
-                <User className="icon-tiny" /> {c.instructor}
-              </p>
-              <p>
-                <Clock className="icon-tiny" /> {c.date} @ {c.time}
-              </p>
-              <p>
-                <MapPin className="icon-tiny" /> {c.location}
-              </p>
-              <button className="btn-primary" onClick={() => onBookClass(c.id)}>
-                Book
-              </button>
+              <h3>{c.title}</h3>
+              <p>{c.description}</p>
+              <p>{new Date(c.date).toLocaleDateString()} @ {c.time}</p>
+              <p>{c.location}</p>
+              <p>Duration: {c.duration} min | Capacity: {c.capacity}</p>
             </div>
           ))}
-          {classes.length === 0 && <p>No available classes yet.</p>}
+          {classes2.length === 0 && <p>No classes yet.</p>}
         </div>
       </section>
-
-      <section className="dashboard-section">
-        <h2>Your Bookings</h2>
-        <ul className="booking-list">
-          {bookings
-            .filter((b) => b.userId === currentUser.id)
-            .map((b) => {
-              const cls = classes.find((c) => c.id === b.classId);
-              return (
-                <li key={b.id}>
-                  {cls ? `${cls.name} - ${cls.date} @ ${cls.time}` : 'Unknown class'}
-                </li>
-              );
-            })}
-          {bookings.filter((b) => b.userId === currentUser.id).length === 0 && (
-            <p>You have no bookings yet.</p>
-          )}
-        </
+    </div>
+  );
+}

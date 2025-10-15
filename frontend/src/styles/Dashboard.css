@@ -1,0 +1,511 @@
+/* src/styles/Dashboard.css */
+
+.dashboard-container {
+  min-height: 100vh;
+  padding: 24px;
+  background: #f7fafc;
+}
+
+.dashboard-header {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.dashboard-subtitle {
+  color: #718096;
+  font-size: 16px;
+}
+
+/* Token Banner */
+.token-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.token-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.token-icon {
+  color: #ffd700;
+}
+
+.token-label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.token-value {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Navigation Tabs */
+.dashboard-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.tab {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: #f0f4ff;
+}
+
+.tab-active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.dashboard-content {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Class Cards */
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.class-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.class-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
+  transform: translateY(-4px);
+}
+
+.class-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.class-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+}
+
+.class-description {
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.class-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.class-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: auto;
+  margin-bottom: 12px;
+}
+
+.class-capacity {
+  font-size: 13px;
+}
+
+.capacity-label {
+  color: #718096;
+}
+
+.capacity-value {
+  font-weight: 600;
+  color: #667eea;
+  margin-left: 4px;
+}
+
+.class-token-cost {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffa500;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Class List View */
+.class-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.class-list-item {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.class-list-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.class-list-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.class-list-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 140px;
+}
+
+/* Bookings */
+.bookings-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.booking-card {
+  background: white;
+  border: 2px solid #48bb78;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+
+.booking-status {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.booking-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.token-used {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffa500;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Token Packages */
+.token-packages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.token-package {
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.token-package:hover {
+  border-color: #667eea;
+  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.2);
+  transform: translateY(-8px);
+}
+
+.package-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #48bb78;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.package-tokens {
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.package-tokens h3 {
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.package-price {
+  margin-bottom: 24px;
+}
+
+.price-amount {
+  display: block;
+  font-size: 40px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.price-per {
+  display: block;
+  font-size: 13px;
+  color: #718096;
+}
+
+/* Purchase Confirmation */
+.confirm-purchase {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.purchase-summary {
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.purchase-summary h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row.discount {
+  color: #48bb78;
+  font-weight: 600;
+}
+
+.summary-row.total {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2d3748;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 2px solid #2d3748;
+}
+
+.text-muted {
+  color: #718096;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .token-banner {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .token-info {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dashboard-tabs {
+    flex-wrap: wrap;
+  }
+
+  .class-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .class-list-content {
+    flex-direction: column;
+  }
+
+  .class-list-actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .token-packages {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*form elements*/
+.form-input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.form-textarea {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-height: 80px;
+  resize: vertical;
+} 
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 0.5rem;
+}
+
+
+.form-select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+
+.class-form {
+  display: grid;
+  grid-row: inherit;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.5rem;
+}
+
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
