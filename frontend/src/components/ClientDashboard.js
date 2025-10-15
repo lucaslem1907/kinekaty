@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LogOut, Calendar, Clock, MapPin, Coins, Search, ShoppingCart } from 'lucide-react';
-import { getClassesInRange, formatDate, formatTime, getUpcomingClasses, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
+import { formatDate, formatTime, getUpcomingClasses, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
 import '../styles/Dashboard.css';
 
 export default function ClientDashboard({ currentUser, classes, bookings, onBookClass, onPurchaseTokens, onLogout }) {
@@ -13,20 +13,10 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
   const upcomingClasses = getUpcomingClasses(classes);
   
   // Get classes near user's location
-  const nearbyClasses = getClassesInRange(
-    classes,
-    currentUser.latitude,
-    currentUser.longitude,
-    currentUser.preferredDistance
-  ).slice(0, 5);
+  
 
   const handleSearch = () => {
-    const results = getClassesInRange(
-      classes,
-      currentUser.latitude,
-      currentUser.longitude,
-      currentUser.preferredDistance
-    );
+    const results = classes
     setSearchResults(results);
     setView('search-results');
   };
@@ -123,15 +113,13 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
         <div className="dashboard-content">
           <div className="card">
             <h2 className="card-title">Classes Near You</h2>
-            <p className="text-muted mb-4">
-              Showing classes within {currentUser.preferredDistance} km of your location
-            </p>
             
-            {nearbyClasses.length === 0 ? (
-              <p className="text-muted">No classes available in your area. Try increasing your search distance in your profile.</p>
+            
+            {classes.length === 0 ? (
+              <p className="text-muted">No classes available at the moment. Please check back later.</p>
             ) : (
               <div className="class-grid">
-                {nearbyClasses.map(cls => {
+                {classes.map(cls => {
                   const classBookings = bookings.filter(b => b.classId === cls.id);
                   const isBooked = myBookings.some(b => b.classId === cls.id);
                   const isFull = classBookings.length >= parseInt(cls.capacity);
@@ -140,7 +128,6 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
                     <div key={cls.id} className="class-card">
                       <div className="class-header">
                         <h3 className="class-title">{cls.title}</h3>
-                        <span className="badge badge-primary">{cls.distance.toFixed(1)} km away</span>
                       </div>
                       <p className="class-description">{cls.description}</p>
                       <div className="class-details">
@@ -222,7 +209,6 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
                             <span><Calendar size={14} /> {formatDate(cls.date)}</span>
                             <span><Clock size={14} /> {formatTime(cls.time)}</span>
                             <span><MapPin size={14} /> {cls.location}</span>
-                            <span className="badge badge-primary">{cls.distance.toFixed(1)} km</span>
                           </div>
                         </div>
                         <div className="class-list-actions">

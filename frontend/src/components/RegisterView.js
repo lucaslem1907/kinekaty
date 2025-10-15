@@ -85,7 +85,6 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     );
   }
 
-  // Missing closing brace for the function component
 
  return (
     <div className="auth-container">
@@ -205,7 +204,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Postcode Code</label>
+                <label className="form-label">Postal Code</label>
                 <input
                   type="text"
                   value={formData.zipCode}
