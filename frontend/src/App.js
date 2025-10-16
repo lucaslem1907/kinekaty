@@ -1,15 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Calendar,
-  Users,
-  Plus,
-  LogIn,
-  LogOut,
-  User,
-  Clock,
-  MapPin,
-  Search,
-} from 'lucide-react';
 import ClientDashboard from './components/ClientDashboard.js';
 import LoginView from './components/LoginView.js';
 import RegisterView from './components/RegisterView.js';
