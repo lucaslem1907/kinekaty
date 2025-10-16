@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LogOut, Calendar, Users, Plus, Trash2, Coins } from 'lucide-react';
 import '../styles/Dashboard.css';
 
-export default function AdminDashboard({ currentUser, classes, users, bookings, onCreateClass, onDeleteClass, onLogout, onViewChange }) {
+export default function AdminDashboard({ currentUser, classes, users, bookings, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [error, setError] = useState('');
     const [newClass, setNewClass] = useState({
@@ -20,22 +20,22 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
 
     const handleCreateClass = async (e) => {
         e.preventDefault();
-   
-            onCreateClass(newClass);
-            setNewClass({
-                title: '',
-                date: '',
-                time: '',
-                duration: '',
-                location: '',
-                latitude: 50.8503,
-                longitude: 4.3517,
-                capacity: '',
-                description: ''
-            });
-            setError('');
-            setShowCreateForm(false);
-            alert('Class created successfully!');
+
+        onCreateClass(newClass);
+        setNewClass({
+            title: '',
+            date: '',
+            time: '',
+            duration: '',
+            location: '',
+            latitude: 50.8503,
+            longitude: 4.3517,
+            capacity: '',
+            description: ''
+        });
+        setError('');
+        setShowCreateForm(false);
+        alert('Class created successfully!');
 
     };
 
@@ -65,6 +65,8 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                 <div className="stat-card">
                     <div>
                         <div className="stat-value">{classes.length}</div>
+                        {console.log(classes)}
+
                         <div className="stat-label">Total Classes</div>
                     </div>
                     <Calendar size={48} style={{ color: '#667eea', opacity: 0.3 }} />
@@ -72,7 +74,7 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
 
                 <div className="stat-card">
                     <div>
-                        <div className="stat-value">{clientUsers.length}</div>
+                        <div className="stat-value">{users.length}</div>
                         <div className="stat-label">Total Clients</div>
                     </div>
                     <Users size={48} style={{ color: '#48bb78', opacity: 0.3 }} />
@@ -246,8 +248,8 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                         {classes.map((cls) => {
                             const classBookings = bookings.filter(b => b.classId === cls.id);
                             return (
-                                <div key={cls.id} className="class-list-item">
-                                    <div className="class-list-content">
+                                <div key={cls.id} className="class-list-item" style={{ cursor: 'pointer' }} >
+                                    <div className="class-list-content" onClick={() => onViewClass(cls.id)}>
                                         <div style={{ flex: 1 }}>
                                             <h3 className="class-title">{cls.title}</h3>
                                             <p className="class-description">{cls.description}</p>
@@ -262,7 +264,8 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                                                 {classBookings.length}/{cls.capacity} booked
                                             </span>
                                             <button
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     if (window.confirm('Are you sure you want to delete this class?')) {
                                                         onDeleteClass(cls.id);
                                                     }

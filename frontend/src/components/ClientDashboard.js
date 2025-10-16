@@ -9,20 +9,16 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [bookingMessage, setBookingMessage] = useState({ show: false, text: '', type: '' });
 
-  const myBookings = bookings.filter(b => b.userId === currentUser.id);
-  const upcomingClasses = getUpcomingClasses(classes);
-  
-  // Get classes near user's location
-  
-
   const handleSearch = () => {
     const results = classes
     setSearchResults(results);
     setView('search-results');
   };
 
-  const handleBookClass = (classId) => {
-    const result = onBookClass(classId);
+  const handleBookClass = async (classId) => {
+    const result = await onBookClass(classId);
+    if (!result) return;
+
     setBookingMessage({
       show: true,
       text: result.message,
@@ -49,7 +45,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
       <header className="dashboard-header">
         <div>
           <h1 className="dashboard-title">My Dashboard</h1>
-          <p className="dashboard-subtitle">Welcome back, {currentUser.name}</p>
+          <p className="dashboard-subtitle">Welcome back, {currentUser.name + currentUser.id}</p>
         </div>
         <button onClick={onLogout} className="btn btn-danger">
           <LogOut size={18} />
@@ -81,26 +77,26 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
 
       {/* Navigation Tabs */}
       <div className="dashboard-tabs">
-        <button 
+        <button
           className={`tab ${view === 'overview' ? 'tab-active' : ''}`}
           onClick={() => setView('overview')}
         >
           Overview
         </button>
-        <button 
+        <button
           className={`tab ${view === 'search-results' ? 'tab-active' : ''}`}
           onClick={handleSearch}
         >
           <Search size={18} />
           Search Classes
         </button>
-        <button 
+        <button
           className={`tab ${view === 'my-bookings' ? 'tab-active' : ''}`}
           onClick={() => setView('my-bookings')}
         >
-          My Bookings ({myBookings.length})
+          My Bookings ({bookings.length})
         </button>
-        <button 
+        <button
           className={`tab ${view === 'buy-tokens' ? 'tab-active' : ''}`}
           onClick={() => setView('buy-tokens')}
         >
@@ -113,17 +109,18 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
         <div className="dashboard-content">
           <div className="card">
             <h2 className="card-title">Classes Near You</h2>
-            
-            
+
+
             {classes.length === 0 ? (
               <p className="text-muted">No classes available at the moment. Please check back later.</p>
             ) : (
               <div className="class-grid">
-                {classes.map(cls => {
+                {searchResults.map(cls => {
                   const classBookings = bookings.filter(b => b.classId === cls.id);
-                  const isBooked = myBookings.some(b => b.classId === cls.id);
+                  const isBooked = bookings.some(b => b.classId === cls.id);
                   const isFull = classBookings.length >= parseInt(cls.capacity);
-                  
+
+
                   return (
                     <div key={cls.id} className="class-card">
                       <div className="class-header">
@@ -167,8 +164,8 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
                           Not Enough Tokens
                         </button>
                       ) : (
-                        <button 
-                          onClick={() => handleBookClass(cls.id)} 
+                        <button
+                          onClick={() => handleBookClass(cls.id)}
                           className="btn btn-primary btn-block"
                         >
                           Book Now (1 token)
@@ -189,16 +186,16 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
           <div className="card">
             <h2 className="card-title">All Available Classes</h2>
             <p className="text-muted mb-4">Found {searchResults.length} classes within your range</p>
-            
+
             {searchResults.length === 0 ? (
               <p className="text-muted">No classes found. Try increasing your search distance.</p>
             ) : (
               <div className="class-list">
                 {searchResults.map(cls => {
                   const classBookings = bookings.filter(b => b.classId === cls.id);
-                  const isBooked = myBookings.some(b => b.classId === cls.id);
+                  const isBooked = bookings.some(b => b.classId === cls.id);
                   const isFull = classBookings.length >= parseInt(cls.capacity);
-                  
+
                   return (
                     <div key={cls.id} className="class-list-item">
                       <div className="class-list-content">
@@ -242,17 +239,18 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
         <div className="dashboard-content">
           <div className="card">
             <h2 className="card-title">My Bookings</h2>
-            
-            {myBookings.length === 0 ? (
+
+            {bookings.length === 0 ? (
+              console.log('No bookings found for user:', bookings.id),
               <p className="text-muted">You haven't booked any classes yet. Browse available classes to get started!</p>
             ) : (
               <div className="bookings-list">
-                {myBookings.map(booking => {
+                {bookings.map(booking => {
                   const cls = classes.find(c => c.id === booking.classId);
                   if (!cls) return null;
-                  
+
                   return (
-                    <div key={booking.id} className="booking-card">
+                    <div key={bookings.id} className="booking-card">
                       <div className="booking-status">
                         <span className="badge badge-success">Confirmed</span>
                       </div>
@@ -286,7 +284,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
           <div className="card">
             <h2 className="card-title">Purchase Tokens</h2>
             <p className="text-muted mb-4">Choose a package that fits your needs. Each class requires 1 token.</p>
-            
+
             <div className="token-packages">
               {TOKEN_PACKAGES.map((pkg, index) => (
                 <div key={index} className="token-package">
@@ -301,8 +299,8 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
                     <span className="price-amount">€{pkg.price}</span>
                     <span className="price-per">€{getPricePerToken(pkg.tokens, pkg.price)} per token</span>
                   </div>
-                  <button 
-                    onClick={() => handlePurchaseTokens(pkg)} 
+                  <button
+                    onClick={() => handlePurchaseTokens(pkg)}
                     className="btn btn-primary btn-block"
                   >
                     Purchase Now

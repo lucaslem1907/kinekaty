@@ -58,4 +58,16 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+  const GetAllUsers = async (req, res) => {
+    try {
+      const users = await prisma.user.findMany({
+        where: { isAdmin: false },
+        select: { id: true, name: true, email: true, phone: true, isAdmin: true, createdAt: true }
+      });
+      return res.json(users);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Server error' });
+    } 
+  };
+module.exports = { register, login, GetAllUsers };

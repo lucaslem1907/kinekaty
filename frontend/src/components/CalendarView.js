@@ -56,7 +56,7 @@ export default function CalendarView({ classes, bookings, onBack }) {
           <div className="calendar-week">
             {weekDates.map((date, idx) => {
               const dateStr = date.toISOString().split('T')[0];
-              const dayClasses = classes.filter(cls => cls.date === dateStr);
+              const dayClasses = classes.filter(cls => cls.date.split('T')[0] === dateStr);
               const isToday = date.toDateString() === new Date().toDateString();
               
               return (
