@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 const authRoutes = require('./routes/auth');
 const classesRoutes = require('./routes/classes');
 const bookingsRoutes = require('./routes/bookings');
+const tokenRoutes = require('./routes/token');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -20,6 +21,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);
+app.use('/api/tokens', tokenRoutes);
+
 
 // basic health
 app.get('/api/health', (req, res) => res.json({ ok: true }));

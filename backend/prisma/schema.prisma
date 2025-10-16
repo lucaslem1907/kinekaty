@@ -21,7 +21,7 @@ model User {
   phone     String?
   isAdmin   Boolean  @default(false)
   bookings  Booking[]
-  tokens    Token[]
+  tokens    TokenTransaction[]
   createdAt DateTime @default(now())
 }
 
@@ -49,11 +49,11 @@ model Booking {
   @@unique([userId, classId]) // prevents double-booking by same user
 }
 
-model Token {
+model TokenTransaction {
   id        Int      @id @default(autoincrement())
-  token     String   @unique
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
-  expiresAt DateTime
+  amount    Int      // positive = gekocht, negative = gebruikt
+  type      String   // "purchase" of "use"
   createdAt DateTime @default(now())
 }
