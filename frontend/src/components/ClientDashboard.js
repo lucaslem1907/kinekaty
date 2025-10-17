@@ -185,7 +185,6 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
         <div className="dashboard-content">
           <div className="card">
             <h2 className="card-title">All Available Classes</h2>
-            <p className="text-muted mb-4">Found {searchResults.length} classes within your range</p>
 
             {searchResults.length === 0 ? (
               <p className="text-muted">No classes found. Try increasing your search distance.</p>
