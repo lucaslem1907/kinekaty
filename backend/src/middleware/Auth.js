@@ -11,7 +11,7 @@ const verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // ✅ Attach decoded user info to the request
-    req.user = { id: decoded.userId, role: decoded.role };
+    req.user = { id: decoded.userId, isAdmin: decoded.isAdmin };
     next();
   } catch (err) {
     console.error('JWT verification failed:', err);

@@ -60,7 +60,7 @@ const useTokens = async (req, res) => {
 };
 
 // ✅ Bekijk tokens per user
- const getUserTokens = async (req, res) => {
+const getUserTokens = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -69,7 +69,7 @@ const useTokens = async (req, res) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    const balance = await prisma.$transaction.aggregate({
+    const balance = await prisma.tokenTransaction.aggregate({
       _sum: { amount: true },
       where: { userId },
     });
@@ -77,9 +77,8 @@ const useTokens = async (req, res) => {
     const totalTokens = balance._sum.amount || 0;
 
     res.json({
-      totalTokens,
-      transactions,
-    });
+      totalTokens,transactions
+  });
   } catch (err) {
     console.error('Error fetching user tokens:', err);
     res.status(500).json({ error: 'Server error' });
@@ -87,4 +86,34 @@ const useTokens = async (req, res) => {
 };
 
 
-module.exports = { buyTokens, useTokens, getUserTokens };
+// in tokenController.js
+  const getAllUserTokens = async (req, res) => {
+  try {
+    if (!req.user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
+
+    const users = await prisma.user.findMany({
+      include: {
+        tokens: true,
+      },
+    });
+
+    const result = users.map((u) => {
+      const balance = u.tokens.reduce((acc, t) => acc + t.amount, 0);
+      return {
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        tokenBalance: balance,
+      };
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
+module.exports = { buyTokens, useTokens, getUserTokens, getAllUserTokens };

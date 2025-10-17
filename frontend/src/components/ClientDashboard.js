@@ -3,17 +3,12 @@ import { LogOut, Calendar, Clock, MapPin, Coins, Search, ShoppingCart } from 'lu
 import { formatDate, formatTime, getUpcomingClasses, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
 import '../styles/Dashboard.css';
 
-export default function ClientDashboard({ currentUser, classes, bookings, onBookClass, onPurchaseTokens, onLogout }) {
+export default function ClientDashboard({ currentUser, classes, bookings, tokens, onBookClass, onPurchaseTokens, onLogout }) {
   const [view, setView] = useState('overview');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [bookingMessage, setBookingMessage] = useState({ show: false, text: '', type: '' });
 
-  const handleSearch = () => {
-    const results = classes
-    setSearchResults(results);
-    setView('search-results');
-  };
 
   const handleBookClass = async (classId) => {
     const result = await onBookClass(classId);
@@ -34,10 +29,10 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
 
   const confirmPurchase = () => {
     onPurchaseTokens(selectedPackage.tokens);
-    alert(`Successfully purchased ${selectedPackage.tokens} tokens for €${selectedPackage.price}!`);
     setView('overview');
     setSelectedPackage(null);
   };
+
 
   return (
     <div className="dashboard-container">
@@ -45,7 +40,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
       <header className="dashboard-header">
         <div>
           <h1 className="dashboard-title">My Dashboard</h1>
-          <p className="dashboard-subtitle">Welcome back, {currentUser.name + currentUser.id}</p>
+          <p className="dashboard-subtitle">Welcome back, {currentUser.name}</p>
         </div>
         <button onClick={onLogout} className="btn btn-danger">
           <LogOut size={18} />
@@ -58,8 +53,8 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
         <div className="token-info">
           <Coins size={32} className="token-icon" />
           <div>
-            <h3 className="token-label">Available Tokens</h3>
-            <p className="token-value">{currentUser.tokens}</p>
+            <h3 className="token-label"> Available Tokens</h3>
+            <p className="token-value">{tokens.totalTokens}</p>
           </div>
         </div>
         <button onClick={() => setView('buy-tokens')} className="btn btn-success">
@@ -85,7 +80,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
         </button>
         <button
           className={`tab ${view === 'search-results' ? 'tab-active' : ''}`}
-          onClick={handleSearch}
+          onClick={() => setView('search-results')}
         >
           <Search size={18} />
           Search Classes
@@ -97,10 +92,10 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
           My Bookings ({bookings.length})
         </button>
         <button
-          className={`tab ${view === 'buy-tokens' ? 'tab-active' : ''}`}
-          onClick={() => setView('buy-tokens')}
+          className={`tab ${view === 'history' ? 'tab-active' : ''}`}
+          onClick={() => setView('history')}
         >
-          Buy Tokens
+          History
         </button>
       </div>
 
@@ -108,19 +103,14 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
       {view === 'overview' && (
         <div className="dashboard-content">
           <div className="card">
-            <h2 className="card-title">Classes Near You</h2>
-
-
             {classes.length === 0 ? (
               <p className="text-muted">No classes available at the moment. Please check back later.</p>
             ) : (
               <div className="class-grid">
-                {searchResults.map(cls => {
+                {classes.map(cls => {
                   const classBookings = bookings.filter(b => b.classId === cls.id);
                   const isBooked = bookings.some(b => b.classId === cls.id);
                   const isFull = classBookings.length >= parseInt(cls.capacity);
-
-
                   return (
                     <div key={cls.id} className="class-card">
                       <div className="class-header">
@@ -186,11 +176,11 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
           <div className="card">
             <h2 className="card-title">All Available Classes</h2>
 
-            {searchResults.length === 0 ? (
+            {classes.length === 0 ? (
               <p className="text-muted">No classes found. Try increasing your search distance.</p>
             ) : (
               <div className="class-list">
-                {searchResults.map(cls => {
+                {classes.map(cls => {
                   const classBookings = bookings.filter(b => b.classId === cls.id);
                   const isBooked = bookings.some(b => b.classId === cls.id);
                   const isFull = classBookings.length >= parseInt(cls.capacity);
@@ -304,55 +294,127 @@ export default function ClientDashboard({ currentUser, classes, bookings, onBook
                   >
                     Purchase Now
                   </button>
+
                 </div>
+
               ))}
             </div>
           </div>
-        </div>
-      )}
+        </div>)}
 
-      {/* Purchase Confirmation */}
-      {view === 'purchase-confirm' && selectedPackage && (
+
+      {/* Token Transaction History View */}
+      {view === 'history' && (
         <div className="dashboard-content">
           <div className="card">
-            <h2 className="card-title">Confirm Purchase</h2>
-            <div className="confirm-purchase">
-              <div className="purchase-summary">
-                <h3>Order Summary</h3>
-                <div className="summary-row">
-                  <span>Tokens:</span>
-                  <span>{selectedPackage.tokens}</span>
-                </div>
-                <div className="summary-row">
-                  <span>Price per token:</span>
-                  <span>€{getPricePerToken(selectedPackage.tokens, selectedPackage.price)}</span>
-                </div>
-                {selectedPackage.discount > 0 && (
-                  <div className="summary-row discount">
-                    <span>Discount:</span>
-                    <span>{selectedPackage.discount}% OFF</span>
+            <h2 className="card-title">History</h2>
+            {tokens.transactions.length === 0 ? (
+              <p className="text-muted">No token transactions found.</p>
+            ) : (
+              <div className="transactions-list">
+                {tokens.transactions.map((tx) => (
+                  <div key={tx.id} className="transaction-item">
+                    <div>
+                      <span className={`transaction-amount ${tx.amount > 0 ? 'text-success' : 'text-danger'}`}>
+                        {tx.amount > 0 ? '+' : ''}{tx.amount} tokens
+                      </span>
+                      <br />
+                      <small className="text-muted">{new Date(tx.createdAt).toLocaleDateString()}</small>
+                    </div>
+                    <div className="transaction-reason">{tx.reason}</div>
                   </div>
-                )}
-                <div className="summary-row total">
-                  <span>Total:</span>
-                  <span>€{selectedPackage.price}</span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="dashboard-content">
+            <div className="card">
+              <h2 className="card-title">History Classes</h2>
+              {bookings.length === 0 ? (
+                <p className="text-muted">No booked classes found.</p>
+              ) : (
+                <div className="bookings-list">
+                  {bookings.map(booking => {
+                    const cls = classes.find(c => c.id === booking.classId && c.date < new Date().toISOString().split('T')[0]);
+                    if (!cls) return null;
+                    return (
+                      <div key={bookings.id} className="booking-card">
+                        <div className="booking-status">
+                          <span className="badge badge-success">Confirmed</span>
+                        </div>
+                        <h3 className="class-title">{cls.title}</h3>
+
+                        <p className="class-description">{cls.description}</p>
+                        <div className="class-details">
+                          <span><Calendar size={14} /> {formatDate(cls.date)}</span>
+                          <span><Clock size={14} /> {formatTime(cls.time)} ({cls.duration} min)</span>
+                          <span><MapPin size={14} /> {cls.location}</span>
+                        </div>
+                        <div className="booking-footer">
+                          <small className="text-muted">
+                            Booked on {new Date(booking.bookedAt).toLocaleDateString()}
+                          </small>
+
+                          <span className="token-used">
+                            <Coins size={14} /> 1 token used
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-              <div className="alert alert-info">
-                <strong>Note:</strong> This is a demo. In a real application, you would be redirected to a secure payment gateway.
-              </div>
-              <div className="form-actions">
-                <button onClick={() => setView('buy-tokens')} className="btn btn-secondary">
-                  Cancel
-                </button>
-                <button onClick={confirmPurchase} className="btn btn-success">
-                  Confirm Purchase
-                </button>
+              )}
+            </div>
+          </div>
+
+        </div>)}
+
+
+
+      {/* Purchase Confirmation */}
+      {
+        view === 'purchase-confirm' && selectedPackage && (
+          <div className="dashboard-content">
+            <div className="card">
+              <h2 className="card-title">Confirm Purchase</h2>
+              <div className="confirm-purchase">
+                <div className="purchase-summary">
+                  <h3>Order Summary</h3>
+                  <div className="summary-row">
+                    <span>Tokens:</span>
+                    <span>{selectedPackage.tokens}</span>
+                  </div>
+                  <div className="summary-row">
+                    <span>Price per token:</span>
+                    <span>€{getPricePerToken(selectedPackage.tokens, selectedPackage.price)}</span>
+                  </div>
+                  {selectedPackage.discount > 0 && (
+                    <div className="summary-row discount">
+                      <span>Discount:</span>
+                      <span>{selectedPackage.discount}% OFF</span>
+                    </div>
+                  )}
+                  <div className="summary-row total">
+                    <span>Total:</span>
+                    <span>€{selectedPackage.price}</span>
+                  </div>
+                </div>
+                <div className="alert alert-info">
+                  <strong>Note:</strong> This is a demo. In a real application, you would be redirected to a secure payment gateway.
+                </div>
+                <div className="form-actions">
+                  <button onClick={() => setView('buy-tokens')} className="btn btn-secondary">
+                    Cancel
+                  </button>
+                  <button onClick={confirmPurchase} className="btn btn-success">
+                    Confirm Purchase
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }

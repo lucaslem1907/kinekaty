@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LogOut, Calendar, Users, Plus, Trash2, Coins } from 'lucide-react';
 import '../styles/Dashboard.css';
 
-export default function AdminDashboard({ currentUser, classes, users, bookings, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass }) {
+export default function AdminDashboard({ currentUser, classes, users, bookings, tokens, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [error, setError] = useState('');
     const [newClass, setNewClass] = useState({
@@ -44,8 +44,17 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
     };
 
     const clientUsers = users.filter(u => !u.isAdmin);
-    const totalTokensInSystem = clientUsers.reduce((sum, user) => sum + (user.tokens || 0), 0);
 
+    const sum_tokens = () => {
+    let sum = 0;
+    for (let i = 0; i < tokens.length; i++) {
+        sum += tokens[i].tokenBalance;
+     };
+    return sum
+    console.log("total tokens: ", sum);
+}
+const total= sum_tokens()
+    
     return (
         <div className="dashboard-container">
             {/* Header */}
@@ -65,7 +74,7 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                 <div className="stat-card">
                     <div>
                         <div className="stat-value">{classes.length}</div>
-                        {console.log(classes)}
+                        
 
                         <div className="stat-label">Total Classes</div>
                     </div>
@@ -90,7 +99,8 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
 
                 <div className="stat-card">
                     <div>
-                        <div className="stat-value">{totalTokensInSystem}</div>
+                        <div className="stat-value">{total}</div>
+                        
                         <div className="stat-label">Active Tokens</div>
                     </div>
                     <Coins size={48} style={{ color: '#ffa500', opacity: 0.3 }} />
@@ -108,7 +118,7 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                 </button>
                 <button
                     onClick={() => onViewChange('calendar-view')}
-                    className="btn btn-secondary"
+                    className="btn btn-primary"
                 >
                     <Calendar size={18} />
                     View Calendar
@@ -307,6 +317,12 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                             <tbody>
                                 {clientUsers.map((user) => {
                                     const userBookings = bookings.filter(b => b.userId === user.id);
+                                    const tokens_peruser = tokens.filter(t => t.id === user.id);
+                                    console.log("user: ", user.id);
+                                    console.log(tokens_peruser);
+                                    console.log("bookings", typeof bookings );
+                                    console.log("tokens: ", typeof tokens);
+                                    //const tokens_peruser = tokens.find(t => t.id === user.id) ;
                                     return (
                                         <tr key={user.id}>
                                             <td style={{ fontWeight: 600 }}>{user.name}</td>
@@ -315,7 +331,7 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                                             <td>{user.city || 'N/A'}</td>
                                             <td>
                                                 <span className="badge badge-warning">
-                                                    <Coins size={12} /> {user.tokens || 0}
+                                                    <Coins size={12} /> {tokens_peruser?.tokenBalance ?? 0}
                                                 </span>
                                             </td>
                                             <td>

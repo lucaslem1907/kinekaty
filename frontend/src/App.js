@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import ClientDashboard from './components/ClientDashboard.js';
 import LoginView from './components/LoginView.js';
 import RegisterView from './components/RegisterView.js';
@@ -13,6 +13,7 @@ export default function ClassBookingApp() {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [tokens, setTokens] = useState([]);
   const [view, setView] = useState('login');
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -77,7 +78,7 @@ export default function ClassBookingApp() {
     };
 
     fetchUsers();
-  },[]);
+  }, []);
 
   const handleCreateClass = async (classData) => {
     try {
@@ -107,19 +108,33 @@ export default function ClassBookingApp() {
     fetchClasses();
   }, []);
 
-  const handleBookClass = (classId) => {
-    // Check if user has tokens
-    /*if (currentUser.tokens < 1) {
-      return { success: false, message: 'Not enough tokens! Please purchase more.' };
-    }
+  const handleBookClass = async (classId) => {
+    // deduct token from user
+    const deductToken = async (amount) => {
+      try {
+        const token = localStorage.getItem('token');
+        console.log('Using token:', amount);
+        const res = await fetch(`http://localhost:4000/api/tokens/use`, {
+          method: 'POST',
+          headers: {  
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}` },
+          body: JSON.stringify(amount),
+        });
+        const data = await res.json();
 
-    // Deduct token
-    const updatedUser = { ...currentUser, tokens: currentUser.tokens - 1 };
-    setCurrentUser(updatedUser);
-
-    // Update user in users array
-    setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));*/
-
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to fetch tokens');
+        }
+        return data
+      } catch (err) {
+        console.error('Error fetching tokens:', err);
+        return 0;
+      }
+    }; 
+    
+     // ✅ Book the class (only if token deduction succeeded)
+    await deductToken(1);
     // Create booking
     const newBooking = async (bookingsdata) => {
       try {
@@ -144,124 +159,179 @@ export default function ClassBookingApp() {
       } catch (err) {
         console.error('booking error', err);
         alert(err.message || 'Booking failed!');
-      };
-    }
+      }
+    };
+    
     newBooking({ userId: currentUser.id, classId, user: currentUser.name });
   };
 
-useEffect(() => {
-  const fetchBookings = async () => {
-    const token = localStorage.getItem('token');
-    if (!token || !currentUser) return;
+  useEffect(() => {
+    const fetchBookings = async () => {
+      const token = localStorage.getItem('token');
+      if (!token || !currentUser) return;
 
-    const endpoint = currentUser.isAdmin
-      ? 'http://localhost:4000/api/bookings/all' // admin gets all bookings
-      : 'http://localhost:4000/api/bookings/me'; // normal user gets own bookings
+      const endpoint = currentUser.isAdmin
+        ? 'http://localhost:4000/api/bookings/all' // admin gets all bookings
+        : 'http://localhost:4000/api/bookings/me'; // normal user gets own bookings
 
-    try {
-      const res = await fetch(endpoint, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error('Failed to load bookings:', data.error);
-        setBookings([]); // fallback
-        return;
+      try {
+        const res = await fetch(endpoint, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        console.log('aantal bookings bij fetching:',data);  
+        if (!res.ok) {
+          console.error('Failed to load bookings:', data.error);
+          setBookings([]); // fallback
+          return;
+        }
+        setBookings(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
+        setBookings([]);
       }
-      console.log('Fetched bookings:', data);
-      setBookings(Array.isArray(data) ? data : []);
+    };
+
+    fetchBookings();
+  }, [currentUser]);
+
+    const handlePurchaseTokens = (amount) => {
+    try {
+      const token = localStorage.getItem('token');
+      fetch('http://localhost:4000/api/tokens/buy', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert('Error purchasing tokens: ' + data.error);
+            return;
+          }
+          alert('Successfully purchased ' + amount + ' tokens!');
+          
+        }
+        );
     } catch (err) {
-      console.error('Error fetching bookings:', err);
-      setBookings([]);
+      console.error('Error purchasing tokens:', err);
     }
+    setView('client-dashboard');
   };
 
-  fetchBookings();
-}, [currentUser]);
+  useEffect(() => {
+    const fetchtokens = async () => {
+      const token = localStorage.getItem('token');
+      if (!token || !currentUser) return;
 
-  const handlePurchaseTokens = (amount) => {
-    const updatedUser = { ...currentUser, tokens: currentUser.tokens + amount };
-    setCurrentUser(updatedUser);
-    setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
-    return true;
-  };
+      const endpoint = currentUser.isAdmin
+        ? 'http://localhost:4000/api/tokens/all' // admin gets all tokens
+        : 'http://localhost:4000/api/tokens/me'; // normal user gets own tokens
 
-  const handleLogout = () => {
-    setCurrentUser(null);
-    setView('login');
-  };
-  const handleDeleteClass = (classId) => {
-    setClasses(classes.filter(c => c.id !== classId));
-    setBookings(bookings.filter(b => b.classId !== classId));
-  };
+      try {
+        const res = await fetch(endpoint, {
+          headers: { 
+            'content-Type': 'application/json',
+            Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        
+        if (!res.ok) {
+          console.error('Failed to load bookings:', data.error);
+          setTokens([]); // fallback
+          return;
+        }
+        console.log('Fetched tokens:', data);
+        setTokens(data);
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
+        setTokens([]);
+      }
+    };
+    fetchtokens();
+  }, [currentUser, bookings]);
+    
 
-  const handleUpdateClass = (updatedClass) => {
-    setClasses(classes.map(c => c.id === updatedClass.id ? updatedClass : c));
-  };
+    const handleLogout = () => {
+      setCurrentUser(null);
+      setView('login');
+    };
+    const handleDeleteClass = (classId) => {
+      setClasses(classes.filter(c => c.id !== classId));
+      setBookings(bookings.filter(b => b.classId !== classId));
+    };
 
-  const handleViewClass = (classId) => {
-    const classToView = classes.find(c => c.id === classId);
-    setSelectedClass(classToView);
-    setView('class-edit');
-  };
+    const handleUpdateClass = (updatedClass) => {
+      setClasses(classes.map(c => c.id === updatedClass.id ? updatedClass : c));
+    };
 
-  return (
-    <div className="app-background">
-      {view === 'login' && (
-        <LoginView
-          onLogin={handleLogin}
-          onSwitchToRegister={() => setView('register')}
-        />
-      )}
-      {view === 'register' && (
-        <RegisterView
-          onRegister={handleRegister}
-          onSwitchToLogin={() => setView('login')}
-        />
-      )}
-      {view === 'admin-dashboard' && (
-        <AdminDashboard
-          currentUser={currentUser}
-          classes={classes}
-          users={users}
-          bookings={bookings}
-          onCreateClass={handleCreateClass}
-          onDeleteClass={handleDeleteClass}
-          onLogout={handleLogout}
-          onViewChange={setView}
-          onViewClass={handleViewClass}
-        />
-      )}
-      {view === 'client-dashboard' && (
-        <ClientDashboard
-          currentUser={currentUser}
-          classes={classes}
-          bookings={bookings}
-          onBookClass={handleBookClass}
-          onPurchaseTokens={handlePurchaseTokens}
-          onLogout={handleLogout}
-        />
-      )}
-      {view === 'calendar-view' && (
-        <CalendarView
-          classes={classes}
-          bookings={bookings}
-          onBack={() => setView('admin-dashboard')}
-        />
-      )}
-      {view === 'class-edit' && selectedClass && (
-        <ClassEditView
-          classes={selectedClass}
-          users={users}
-          bookings={bookings}
-          onSave={handleUpdateClass}
-          onDelete={handleDeleteClass}
-          onBack={() => setView('admin-dashboard')}
-        />
-      )}
-    </div>
-  );
-}
+    const handleViewClass = (classId) => {
+      const classToView = classes.find(c => c.id === classId);
+      setSelectedClass(classToView);
+      setView('class-edit');
+    };
+
+    return (
+      <div className="app-background">
+        {view === 'login' && (
+          <LoginView
+            onLogin={handleLogin}
+            onSwitchToRegister={() => setView('register')}
+          />
+        )}
+        {view === 'register' && (
+          <RegisterView
+            onRegister={handleRegister}
+            onSwitchToLogin={() => setView('login')}
+          />
+        )}
+        {view === 'admin-dashboard' && (
+          <AdminDashboard
+            currentUser={currentUser}
+            classes={classes}
+            users={users}
+            bookings={bookings}
+            tokens={tokens}
+            onCreateClass={handleCreateClass}
+            onDeleteClass={handleDeleteClass}
+            onLogout={handleLogout}
+            onViewChange={setView}
+            onViewClass={handleViewClass}
+          />
+        )}
+        {view === 'client-dashboard' && (
+          <ClientDashboard
+            currentUser={currentUser}
+            classes={classes}
+            bookings={bookings}
+            tokens={tokens}
+            onBookClass={handleBookClass}
+            onPurchaseTokens={handlePurchaseTokens}
+            onLogout={handleLogout}
+          />
+        )}
+        {view === 'calendar-view' && (
+          <CalendarView
+            classes={classes}
+            bookings={bookings}
+            onBack={() => setView('admin-dashboard')}
+          />
+        )}
+        {view === 'class-edit' && selectedClass && (
+          <ClassEditView
+            classes={selectedClass}
+            users={users}
+            bookings={bookings}
+            tokens={tokens}
+            onSave={handleUpdateClass}
+            onDelete={handleDeleteClass}
+            onBack={() => setView('admin-dashboard')}
+          />
+        )}
+      </div>
+    );
+  }
 
 
