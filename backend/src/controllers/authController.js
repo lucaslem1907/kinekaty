@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // User Registration
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone, isAdmin } = req.body;
+    const { name, email, password, phone, isAdmin, city, address, houseNumber } = req.body;
 
     // Check if user exists
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -17,7 +17,7 @@ const register = async (req, res) => {
 
     // Create user
     const user = await prisma.user.create({
-      data: { name, email, password: hashed, phone, isAdmin: !!isAdmin }
+      data: { name, email, password: hashed, phone, isAdmin: !!isAdmin,city, street: address, number: parseInt(houseNumber)}
     });
 
     return res.status(201).json({
@@ -65,7 +65,7 @@ const login = async (req, res) => {
     try {
       const users = await prisma.user.findMany({
         where: { isAdmin: false },
-        select: { id: true, name: true, email: true, phone: true, isAdmin: true }
+        select: { id: true, name: true, email: true, phone: true, isAdmin: true, createdAt: true }
       });
       return res.json(users);
     } catch (err) {

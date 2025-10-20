@@ -38,6 +38,22 @@ const deleteClass = async (req, res) => {
   }
 };
 
+//update a class
+const updateClass = async (req, res) => {
+  try {
+    const classId = parseInt(req.params.id);
+    const { title, description, date, time, duration, location, capacity } = req.body;
+    const updatedClass = await prisma.class.update({
+      where: { id: classId },
+      data: { title, description, date: new Date(date), time, duration: Number(duration), location, capacity: Number(capacity) },
+    });
+    res.json(updatedClass);
+  } catch (err) {
+    console.error('Error updating class:', err);
+    res.status(500).json({ error: 'Server error' });  
+  }
+}
+
 
 // Get all classes
 const getClasses = async (req, res) => {
@@ -51,4 +67,4 @@ const getClasses = async (req, res) => {
 };
 
 
-module.exports = { createClass, deleteClass, getClasses };
+module.exports = { createClass, deleteClass,updateClass,getClasses };

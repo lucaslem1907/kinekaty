@@ -54,43 +54,43 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
   };
   // paid service, so using free geolocation API (Nominatim)
   const handleGetLocation = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
 
-        try {
-          // Reverse geocoding request
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-          );
-          const data = await response.json();
+          try {
+            // Reverse geocoding request
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await response.json();
 
-          // Extract address components
-          const { road, house_number, postcode, city, town, village } = data.address;
+            // Extract address components
+            const { road, house_number, postcode, city, town, village } = data.address;
 
-          setFormData({
-            ...formData,
-            latitude,
-            longitude,
-            street: road || "",
-            number: house_number || "",
-            postalCode: postcode || "",
-            city: city || town || village || ""
-          });
-        } catch (err) {
-          console.error("Failed to get address:", err);
-          alert("Unable to fetch address. Using coordinates only.");
+            setFormData({
+              ...formData,
+              latitude,
+              longitude,
+              street: road || "",
+              number: house_number || "",
+              postalCode: postcode || "",
+              city: city || town || village || ""
+            });
+          } catch (err) {
+            console.error("Failed to get address:", err);
+            alert("Unable to fetch address. Using coordinates only.");
+          }
+        },
+        (error) => {
+          alert('Unable to get your location. Using default location (Brussels).');
         }
-      },
-      (error) => {
-        alert('Unable to get your location. Using default location (Brussels).');
-      }
-    );
-  } else {
-    alert('Geolocation is not supported by your browser.');
-  }
-};
+      );
+    } else {
+      alert('Geolocation is not supported by your browser.');
+    }
+  };
 
   if (success) {
     return (
@@ -105,7 +105,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
   }
 
 
- return (
+  return (
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
@@ -166,7 +166,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               />
             </div>
 
-          
+
             <button type="submit" className="btn btn-primary btn-block">
               Next: Location Details →
             </button>
@@ -208,7 +208,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               <div className="form-group">
                 <label className="form-label">Postcode</label>
                 <input
-                  type="text"
+                  type="number"
                   value={formData.zipCode}
                   onChange={(e) => handleInputChange('zipCode', e.target.value)}
                   className="form-input"
@@ -216,6 +216,18 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
                 />
               </div>
             </div>
+            <div className='form-row'>
+            <div className="form-group">
+              <label className="form-label">Huisnummer</label>
+              <input
+                type="number"
+                value={formData.houseNumber}
+                onChange={(e) => handleInputChange('houseNumber', e.target.value)}
+                className="form-input"
+                placeholder="1000"
+              />
+            </div>
+          </div>
 
     
            {/* <button 
@@ -233,27 +245,27 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               </small>
             </div>*/}
 
-            <div className="form-actions">
-              <button 
-                type="button" 
-                onClick={() => setStep(1)} 
-                className="btn btn-secondary"
-              >
-                ← Back
-              </button>
-              <button type="submit" className="btn btn-primary">
-                Complete Registration
-              </button>
-            </div>
-          </form>
-        )}
-
-        <div className="auth-footer">
-          <button onClick={onSwitchToLogin} className="link-button">
-            Already have an account? <strong>Login here</strong>
+        <div className="form-actions">
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className="btn btn-secondary"
+          >
+            ← Back
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Complete Registration
           </button>
         </div>
+      </form>
+        )}
+
+      <div className="auth-footer">
+        <button onClick={onSwitchToLogin} className="link-button">
+          Already have an account? <strong>Login here</strong>
+        </button>
       </div>
     </div>
+    </div >
   );
-  }
+}
