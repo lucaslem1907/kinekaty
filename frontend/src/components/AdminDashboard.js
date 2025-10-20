@@ -62,7 +62,7 @@ const total= sum_tokens()
             <header className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title">Admin Dashboard</h1>
-                    <p className="dashboard-subtitle">Welcome back, {currentUser.name}</p>
+                    <p className="dashboard-subtitle">Welcome back, {currentUser ? currentUser.name: "Loading"}</p>
                 </div>
                 <button onClick={onLogout} className="btn btn-danger">
                     <LogOut size={18} />
@@ -118,7 +118,7 @@ const total= sum_tokens()
                     {showCreateForm ? 'Cancel' : 'Create New Class'}
                 </button>
                 <button
-                    onClick={() => onViewChange('calendar-view')}
+                    onClick={() => onViewChange()}
                     className="btn btn-primary"
                 >
                     <Calendar size={18} />
@@ -204,29 +204,6 @@ const total= sum_tokens()
                                 />
                             </div>
 
-                            <div className="form-group">
-                                <label className="form-label">Latitude</label>
-                                <input
-                                    type="number"
-                                    step="0.0001"
-                                    value={newClass.latitude}
-                                    onChange={(e) => handleInputChange('latitude', parseFloat(e.target.value))}
-                                    className="form-input"
-                                    placeholder="50.8503"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Longitude</label>
-                                <input
-                                    type="number"
-                                    step="0.0001"
-                                    value={newClass.longitude}
-                                    onChange={(e) => handleInputChange('longitude', parseFloat(e.target.value))}
-                                    className="form-input"
-                                    placeholder="4.3517"
-                                />
-                            </div>
 
 
                             <div className="form-group">
@@ -319,7 +296,6 @@ const total= sum_tokens()
                                 {clientUsers.map((user) => {
                                     const userBookings = bookings.filter(b => b.userId === user.id);
                                     const tokens_peruser = tokens.find(t => t.id === user.id);
-                                    //const tokens_peruser = tokens.find(t => t.id === user.id) ;
                                     return (
                                         <tr key={user.id}>
                                             <td style={{ fontWeight: 600 }}>{user.name}</td>

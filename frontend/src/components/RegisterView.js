@@ -52,26 +52,45 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
       setError(err.message);
     }
   };
-
+  // paid service, so using free geolocation API (Nominatim)
   const handleGetLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          // Reverse geocoding request
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          );
+          const data = await response.json();
+
+          // Extract address components
+          const { road, house_number, postcode, city, town, village } = data.address;
+
           setFormData({
             ...formData,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            latitude,
+            longitude,
+            street: road || "",
+            number: house_number || "",
+            postalCode: postcode || "",
+            city: city || town || village || ""
           });
-          alert('Location detected successfully!');
-        },
-        (error) => {
-          alert('Unable to get your location. Using default location (Brussels).');
+        } catch (err) {
+          console.error("Failed to get address:", err);
+          alert("Unable to fetch address. Using coordinates only.");
         }
-      );
-    } else {
-      alert('Geolocation is not supported by your browser.');
-    }
-  };
+      },
+      (error) => {
+        alert('Unable to get your location. Using default location (Brussels).');
+      }
+    );
+  } else {
+    alert('Geolocation is not supported by your browser.');
+  }
+};
 
   if (success) {
     return (
@@ -147,24 +166,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               />
             </div>
 
-            <div className="admin-checkbox-highlight">
-              <div className="checkbox-group">
-                <input
-                  type="checkbox"
-                  id="isAdminReg"
-                  checked={formData.isAdmin}
-                  onChange={(e) => handleInputChange('isAdmin', e.target.checked)}
-                  className="checkbox-input"
-                />
-                <label htmlFor="isAdminReg" className="checkbox-label-bold">
-                  Register as Administrator
-                </label>
-              </div>
-              <p className="checkbox-hint">
-                Check this if you want to create and manage classes
-              </p>
-            </div>
-
+          
             <button type="submit" className="btn btn-primary btn-block">
               Next: Location Details →
             </button>
@@ -176,11 +178,11 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="location-header">
               <MapPin size={24} />
-              <h3>Help us find classes near you</h3>
+              <h3>Adres gegevens</h3>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Street Address</label>
+              <label className="form-label">Straatnaam</label>
               <input
                 type="text"
                 value={formData.address}
@@ -192,7 +194,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
 
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">City *</label>
+                <label className="form-label">Stad</label>
                 <input
                   type="text"
                   value={formData.city}
@@ -204,7 +206,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Postal Code</label>
+                <label className="form-label">Postcode</label>
                 <input
                   type="text"
                   value={formData.zipCode}
@@ -215,24 +217,8 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               </div>
             </div>
 
-           <div className="form-group">
-              <label className="form-label">
-                Search Distance (How far are you willing to travel?)
-              </label>
-              <select
-                value={formData.preferredDistance}
-                onChange={(e) => handleInputChange('preferredDistance', Number(e.target.value))}
-                className="form-select"
-              >
-                <option value={5}>Within 5 km</option>
-                <option value={10}>Within 10 km</option>
-                <option value={20}>Within 20 km</option>
-                <option value={50}>Within 50 km</option>
-                <option value={100}>Within 100 km</option>
-              </select>
-            </div>
-
-            <button 
+    
+           {/* <button 
               type="button" 
               onClick={handleGetLocation} 
               className="btn btn-secondary btn-block mb-3"
@@ -245,7 +231,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
               <small>
                 Current coordinates: {formData.latitude}, {formData.longitude}
               </small>
-            </div>
+            </div>*/}
 
             <div className="form-actions">
               <button 

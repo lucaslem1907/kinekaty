@@ -509,3 +509,11 @@
   gap: 1rem;
   margin-top: 1rem;
 }
+
+.search-input {
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  margin-bottom: 1rem;
+}

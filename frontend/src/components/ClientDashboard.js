@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { LogOut, Calendar, Clock, MapPin, Coins, Search, ShoppingCart } from 'lucide-react';
 import { formatDate, formatTime, getUpcomingClasses, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 export default function ClientDashboard({ currentUser, classes, bookings, tokens, onBookClass, onPurchaseTokens, onLogout }) {
@@ -9,7 +10,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [bookingMessage, setBookingMessage] = useState({ show: false, text: '', type: '' });
 
-
+  const navigate = useNavigate();
   const handleBookClass = async (classId) => {
     const result = await onBookClass(classId);
     if (!result) return;
@@ -40,7 +41,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
       <header className="dashboard-header">
         <div>
           <h1 className="dashboard-title">My Dashboard</h1>
-          <p className="dashboard-subtitle">Welcome back, {currentUser.name}</p>
+          <p className="dashboard-subtitle">Welcome back, {currentUser ? currentUser.name : "Loading..."}</p>
         </div>
         <button onClick={onLogout} className="btn btn-danger">
           <LogOut size={18} />
@@ -174,13 +175,30 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
       {view === 'search-results' && (
         <div className="dashboard-content">
           <div className="card">
-            <h2 className="card-title">All Available Classes</h2>
+            <h2 className="card-title">All Available Classes On Search</h2>
+            <div className="search-board">
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Search classes by title, location, or date..."
+                onChange={(e) => {
+                  const query = e.target.value.toLowerCase();
+                  const results = classes.filter(cls =>
+                    cls.title.toLowerCase().includes(query) ||
+                    cls.location.toLowerCase().includes(query) ||
+                    cls.date.includes(query)
+                  );
+                  setSearchResults(results);
 
-            {classes.length === 0 ? (
-              <p className="text-muted">No classes found. Try increasing your search distance.</p>
+                }}
+              />
+            </div>
+
+            {searchResults.length === 0 ? (
+              <p className="text-muted">Vul de zoekcriteria in</p>
             ) : (
               <div className="class-list">
-                {classes.map(cls => {
+                {searchResults.map(cls => {
                   const classBookings = bookings.filter(b => b.classId === cls.id);
                   const isBooked = bookings.some(b => b.classId === cls.id);
                   const isFull = classBookings.length >= parseInt(cls.capacity);

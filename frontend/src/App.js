@@ -1,4 +1,5 @@
 import React, { useState, useEffect, use } from 'react';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import ClientDashboard from './components/ClientDashboard.js';
 import LoginView from './components/LoginView.js';
 import RegisterView from './components/RegisterView.js';
@@ -18,7 +19,7 @@ export default function ClassBookingApp() {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
 
-
+  const navigate = useNavigate();
 
   const handleLogin = async (userData) => {
     const { email, password, isAdmin } = userData;
@@ -35,8 +36,9 @@ export default function ClassBookingApp() {
 
       // set current user
       setCurrentUser(data.user);
-      setView(data.user.isAdmin ? 'admin-dashboard' : 'client-dashboard');
+      navigate(data.user.isAdmin ? '/admin' : '/client');
       localStorage.setItem('token', data.token);
+
       return true;
     } catch (err) {
       console.error(err);
@@ -116,9 +118,10 @@ export default function ClassBookingApp() {
         console.log('Using token:', amount);
         const res = await fetch(`http://localhost:4000/api/tokens/use`, {
           method: 'POST',
-          headers: {  
+          headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}` },
+            Authorization: `Bearer ${token}`
+          },
           body: JSON.stringify(amount),
         });
         const data = await res.json();
@@ -131,9 +134,9 @@ export default function ClassBookingApp() {
         console.error('Error fetching tokens:', err);
         return 0;
       }
-    }; 
-    
-     // ✅ Book the class (only if token deduction succeeded)
+    };
+
+    // ✅ Book the class (only if token deduction succeeded)
     await deductToken(1);
     // Create booking
     const newBooking = async (bookingsdata) => {
@@ -161,7 +164,7 @@ export default function ClassBookingApp() {
         alert(err.message || 'Booking failed!');
       }
     };
-    
+
     newBooking({ userId: currentUser.id, classId, user: currentUser.name });
   };
 
@@ -179,7 +182,7 @@ export default function ClassBookingApp() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        console.log('aantal bookings bij fetching:',data);  
+        console.log('aantal bookings bij fetching:', data);
         if (!res.ok) {
           console.error('Failed to load bookings:', data.error);
           setBookings([]); // fallback
@@ -195,14 +198,15 @@ export default function ClassBookingApp() {
     fetchBookings();
   }, [currentUser]);
 
-    const handlePurchaseTokens = (amount) => {
+  const handlePurchaseTokens = (amount) => {
     try {
       const token = localStorage.getItem('token');
       fetch('http://localhost:4000/api/tokens/buy', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` },
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({ amount }),
       })
         .then(res => res.json())
@@ -212,7 +216,7 @@ export default function ClassBookingApp() {
             return;
           }
           alert('Successfully purchased ' + amount + ' tokens!');
-          
+
         }
         );
     } catch (err) {
@@ -232,12 +236,13 @@ export default function ClassBookingApp() {
 
       try {
         const res = await fetch(endpoint, {
-          headers: { 
+          headers: {
             'content-Type': 'application/json',
-            Authorization: `Bearer ${token}` },
+            Authorization: `Bearer ${token}`
+          },
         });
         const data = await res.json();
-        
+
         if (!res.ok) {
           console.error('Failed to load bookings:', data.error);
           setTokens([]); // fallback
@@ -252,104 +257,133 @@ export default function ClassBookingApp() {
     };
     fetchtokens();
   }, [currentUser, bookings]);
-    
 
-    const handleLogout = () => {
-      setCurrentUser(null);
-      setView('login');
-    };
-    const handleDeleteClass =  async(classId) => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:4000/api/classes/${classId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json', 
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to delete class');
-        }
-        alert(data.message);
-      } catch (err) {
-        console.error('Error deleting class:', err);
-        alert(err.message || 'Failed to delete class');
-      } 
-      setClasses(classes.filter(c => c.id !== classId));
-      setBookings(bookings.filter(b => b.classId !== classId));
-    };
 
-    const handleUpdateClass = (updatedClass) => {
-      setClasses(classes.map(c => c.id === updatedClass.id ? updatedClass : c));
-    };
+  const handleLogout = () => {
+    setCurrentUser(null);
+    navigate('/login');
+  };
+  const handleDeleteClass = async (classId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:4000/api/classes/${classId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete class');
+      }
+      alert(data.message);
+    } catch (err) {
+      console.error('Error deleting class:', err);
+      alert(err.message || 'Failed to delete class');
+    }
+    setClasses(classes.filter(c => c.id !== classId));
+    setBookings(bookings.filter(b => b.classId !== classId));
+  };
 
-    const handleViewClass = (classId) => {
-      const classToView = classes.find(c => c.id === classId);
-      setSelectedClass(classToView);
-      setView('class-edit');
-    };
+  const handleUpdateClass = (updatedClass) => {
+    setClasses(classes.map(c => c.id === updatedClass.id ? updatedClass : c));
+  };
 
-    return (
-      <div className="app-background">
-        {view === 'login' && (
-          <LoginView
-            onLogin={handleLogin}
-            onSwitchToRegister={() => setView('register')}
-          />
-        )}
-        {view === 'register' && (
-          <RegisterView
-            onRegister={handleRegister}
-            onSwitchToLogin={() => setView('login')}
-          />
-        )}
-        {view === 'admin-dashboard' && (
-          <AdminDashboard
-            currentUser={currentUser}
-            classes={classes}
-            users={users}
-            bookings={bookings}
-            tokens={tokens}
-            onCreateClass={handleCreateClass}
-            onDeleteClass={handleDeleteClass}
-            onLogout={handleLogout}
-            onViewChange={setView}
-            onViewClass={handleViewClass}
-          />
-        )}
-        {view === 'client-dashboard' && (
-          <ClientDashboard
-            currentUser={currentUser}
-            classes={classes}
-            bookings={bookings}
-            tokens={tokens}
-            onBookClass={handleBookClass}
-            onPurchaseTokens={handlePurchaseTokens}
-            onLogout={handleLogout}
-          />
-        )}
-        {view === 'calendar-view' && (
-          <CalendarView
-            classes={classes}
-            bookings={bookings}
-            onBack={() => setView('admin-dashboard')}
-          />
-        )}
-        {view === 'class-edit' && selectedClass && (
-          <ClassEditView
-            classes={selectedClass}
-            users={users}
-            bookings={bookings}
-            tokens={tokens}
-            onSave={handleUpdateClass}
-            onDelete={handleDeleteClass}
-            onBack={() => setView('admin-dashboard')}
-          />
-        )}
-      </div>
-    );
+  const handleViewClass = (classId) => {
+    const classToView = classes.find(c => c.id === classId);
+    setSelectedClass(classToView);
+    navigate('/class-edit');
+  };
+
+useEffect(() => {
+  // Only redirect if the current path is protected and no user is logged in
+  const protectedPaths = ["/admin", "/client", "/calendar", "/class-edit"];
+  if (!currentUser && protectedPaths.includes(window.location.pathname)) {
+    navigate("/login", { replace: true });
   }
+}, [currentUser, navigate]);
+
+  return (
+    <div className="app-background">
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route
+          path="/login"
+          element={
+            <LoginView
+              onLogin={handleLogin}
+              onSwitchToRegister={() => navigate("/register")}
+            />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <RegisterView
+              onRegister={handleRegister}
+              onSwitchToLogin={() => navigate("/login")}
+            />
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminDashboard
+              currentUser={currentUser}
+              classes={classes}
+              users={users}
+              bookings={bookings}
+              tokens={tokens}
+              onCreateClass={handleCreateClass}
+              onDeleteClass={handleDeleteClass}
+              onLogout={handleLogout}
+              onViewChange={() => navigate("/calendar")}
+              onViewClass={handleViewClass}
+            />    
+          }
+        />
+        <Route
+          path="/client"
+          element={
+            <ClientDashboard
+              currentUser={currentUser}
+              classes={classes}
+              bookings={bookings}
+              tokens={tokens}
+              onBookClass={handleBookClass}
+              onPurchaseTokens={handlePurchaseTokens}
+              onLogout={handleLogout}
+            />
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <CalendarView
+              classes={classes}
+              bookings={bookings}
+              onBack={() => navigate("/admin")}
+            />
+          }
+        />
+        <Route
+          path="/class-edit"
+          element={selectedClass &&
+            <ClassEditView
+              classes={selectedClass}
+              users={users}
+              bookings={bookings}
+              tokens={tokens}
+              onSave={handleUpdateClass}
+              onDelete={handleDeleteClass}
+              onBack={() => navigate("/admin")}
+            />
+          }
+        />
+      </Routes>
+    </div>
+  );
+}
 
 

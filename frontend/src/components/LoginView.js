@@ -39,7 +39,7 @@ export default function LoginView({ onLogin, onSwitchToRegister }) {
       <div className="auth-box">
         <div className="auth-header">
           <Calendar className="icon-large" />
-          <h1>Class Booking System</h1>
+          <h1>Kine Katy</h1>
           <p>Login to manage or book classes</p>
         </div>
 
