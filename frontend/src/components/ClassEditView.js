@@ -4,20 +4,28 @@ import { ArrowLeft, Edit2, Save, X, Calendar, Clock, MapPin, Users, Coins, Trash
 import { formatDate, formatTime } from '../utils/helpers';
 import '../styles/ClassEdit.css';
 
-export default function ClassEditView({ classes, users, bookings, onSave, onDelete, onBack }) {
-  console.log('ClassEditView props:', { classes, users, bookings });
+export default function ClassEditView({ classes, users, bookings, tokens, onSave, onDelete, onBack }) {
   const [isEditing, setIsEditing] = useState(true);
   const [editedClass, setEditedClass] = useState({ ...classes });
   const [activeTab, setActiveTab] = useState('details');
   const classData = classes;
-  // Get all bookings for this class
+  // Get all bookings&tokens for this class
   const classBookings = bookings.filter(b => b.classId === classData.id);
+  
+
+const tokensByUserId = {};
+  tokens.forEach(t => {
+    tokensByUserId[t.id] = t;
+  });
+  console.log("tokensByUserId: ", tokensByUserId);
   
   // Get user details for each booking
   const bookingsWithUsers = classBookings.map(booking => {
     const user = users.find(u => u.id === booking.userId);
     return { ...booking, user };
   });
+
+
 
   // Calculate statistics
   const spotsAvailable = parseInt(classData.capacity) - classBookings.length;
@@ -394,7 +402,7 @@ export default function ClassEditView({ classes, users, bookings, onSave, onDele
                           </td>
                           <td>
                             <span className="badge badge-warning">
-                              <Coins size={12} /> {booking.tokensUsed}
+                              <Coins size={12} /> {tokensByUserId[booking.userId]?.tokenBalance || 0}
                             </span>
                           </td>
                           <td>

@@ -258,7 +258,25 @@ export default function ClassBookingApp() {
       setCurrentUser(null);
       setView('login');
     };
-    const handleDeleteClass = (classId) => {
+    const handleDeleteClass =  async(classId) => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`http://localhost:4000/api/classes/${classId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json', 
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to delete class');
+        }
+        alert(data.message);
+      } catch (err) {
+        console.error('Error deleting class:', err);
+        alert(err.message || 'Failed to delete class');
+      } 
       setClasses(classes.filter(c => c.id !== classId));
       setBookings(bookings.filter(b => b.classId !== classId));
     };

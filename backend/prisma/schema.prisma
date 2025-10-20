@@ -20,7 +20,7 @@ model User {
   password  String
   phone     String?
   isAdmin   Boolean  @default(false)
-  bookings  Booking[]
+  bookings  Booking[] 
   tokens    TokenTransaction[]
   createdAt DateTime @default(now())
 }
@@ -34,15 +34,15 @@ model Class {
   duration    Int
   location    String
   capacity    Int
-  bookings    Booking[]
+  bookings    Booking[] 
   createdAt   DateTime @default(now())
 }
 
 model Booking {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  class     Class    @relation(fields: [classId], references: [id])
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
   classId   Int
   bookedAt  DateTime @default(now())
 

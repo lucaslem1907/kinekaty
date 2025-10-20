@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { LogOut, Calendar, Users, Plus, Trash2, Coins } from 'lucide-react';
 import '../styles/Dashboard.css';
+import { formatDate } from '../utils/helpers';
 
 export default function AdminDashboard({ currentUser, classes, users, bookings, tokens, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -264,7 +265,7 @@ const total= sum_tokens()
                                             <h3 className="class-title">{cls.title}</h3>
                                             <p className="class-description">{cls.description}</p>
                                             <div className="class-details">
-                                                <span><Calendar size={14} /> {cls.date}</span>
+                                                <span><Calendar size={14} /> {formatDate( cls.date)}</span>
                                                 <span>⏰ {cls.time} ({cls.duration} min)</span>
                                                 <span>📍 {cls.location}</span>
                                             </div>
@@ -317,11 +318,7 @@ const total= sum_tokens()
                             <tbody>
                                 {clientUsers.map((user) => {
                                     const userBookings = bookings.filter(b => b.userId === user.id);
-                                    const tokens_peruser = tokens.filter(t => t.id === user.id);
-                                    console.log("user: ", user.id);
-                                    console.log(tokens_peruser);
-                                    console.log("bookings", typeof bookings );
-                                    console.log("tokens: ", typeof tokens);
+                                    const tokens_peruser = tokens.find(t => t.id === user.id);
                                     //const tokens_peruser = tokens.find(t => t.id === user.id) ;
                                     return (
                                         <tr key={user.id}>

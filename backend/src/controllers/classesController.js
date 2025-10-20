@@ -23,6 +23,22 @@ const createClass = async (req, res) => {
   }
 };
 
+// Delete a class
+const deleteClass = async (req, res) => {
+  try {
+    const classId = parseInt(req.params.id);
+    const deleted = await prisma.class.delete({ where: { id: classId } });
+    res.json({ message: `Class ${deleted.name} deleted successfully` });
+  } catch (err) {
+    console.error('Error deleting class:', err);
+    res.status(500).json({ error: 'Server error' });
+    if (err.code === 'P2025') {
+      return res.status(404).json({ error: 'Class not found' });
+    }
+  }
+};
+
+
 // Get all classes
 const getClasses = async (req, res) => {
   try {
@@ -34,4 +50,5 @@ const getClasses = async (req, res) => {
   }
 };
 
-module.exports = { createClass, getClasses };
+
+module.exports = { createClass, deleteClass, getClasses };

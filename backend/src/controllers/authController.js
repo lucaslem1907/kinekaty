@@ -65,7 +65,7 @@ const login = async (req, res) => {
     try {
       const users = await prisma.user.findMany({
         where: { isAdmin: false },
-        select: { id: true, name: true, email: true, phone: true, isAdmin: true, createdAt: true }
+        select: { id: true, name: true, email: true, phone: true, isAdmin: true }
       });
       return res.json(users);
     } catch (err) {
