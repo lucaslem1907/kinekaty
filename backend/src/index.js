@@ -9,9 +9,11 @@ const authRoutes = require('./routes/auth');
 const classesRoutes = require('./routes/classes');
 const bookingsRoutes = require('./routes/bookings');
 const tokenRoutes = require('./routes/token');
+const paymentRoutes = require ('./routes/payment');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000'
@@ -22,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/tokens', tokenRoutes);
+app.use('/api/payment', paymentRoutes);
 
 
 // basic health

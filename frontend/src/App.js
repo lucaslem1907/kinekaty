@@ -7,6 +7,7 @@ import RegisterView from './components/RegisterView';
 import AdminDashboard from './components/AdminDashboard';
 import CalendarView from './components/CalendarView';
 import ClassEditView from './components/ClassEditView';
+import PaymentSuccess from './components/PaymentSucces';
 import {
   loginUser,
   fetchClasses,
@@ -17,7 +18,8 @@ import {
   updateClass,
   deleteClass,
   bookClass,
-  purchaseTokens
+  purchaseTokens,
+  buyTokens
 } from './services/api';
 import './styles/App.css';
 
@@ -113,9 +115,11 @@ export default function ClassBookingApp() {
   };
 
   const handlePurchaseTokensSubmit = async (amount) => {
+
     try {
-      const data = await purchaseTokens(amount);
-      alert(`Successfully purchased ${amount} tokens!`);
+      await buyTokens(amount);
+      alert(`Direct to stripe ${amount}`);
+
       // Refetch tokens
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
       setTokens(updatedTokens);
@@ -143,6 +147,14 @@ export default function ClassBookingApp() {
             <LoginView
               onLogin={handleLoginSubmit}
               onSwitchToRegister={() => navigate('/register')}
+            />
+          }
+        />
+
+        <Route
+          path="/success"
+          element={
+            <PaymentSuccess
             />
           }
         />

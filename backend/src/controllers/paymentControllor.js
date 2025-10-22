@@ -1,0 +1,66 @@
+const Stripe =  require('stripe')
+
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+
+const createSession = async(req,res) => {
+    const {tokens} = req.body;
+    try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: { name: `${tokens} tokens` },
+            unit_amount: tokens * 100, // €1 per token
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {tokens},
+      success_url: `${process.env.FRONTEND_URL}/success`,
+      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+}
+
+const webhook = async (req,res) => {
+     const sig = req.headers["stripe-signature"];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+ 
+} catch (err) {
+    console.log("Webhook error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const userId = parseInt(session.metadata.userId);
+    const tokens = parseInt(session.metadata.tokens);
+
+    const user = db.data.users.find(u => u.id === userId);
+    if (user) {
+      user.tokenBalance += tokens;
+      await db.write();
+      console.log(`✅ ${tokens} tokens toegevoegd aan ${user.name}`);
+    }
+  }
+
+  res.json({ received: true });
+
+}
+
+module.exports = {webhook,createSession}

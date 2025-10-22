@@ -1,0 +1,239 @@
+/* src/styles/PaymentSuccess.css */
+
+.payment-success-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Confetti Animation */
+.confetti-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.confetti-animation::before,
+.confetti-animation::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ffd700;
+  animation: confettiFall 3s ease-out;
+}
+
+.confetti-animation::before {
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.confetti-animation::after {
+  left: 80%;
+  animation-delay: 0.5s;
+  background: #48bb78;
+}
+
+@keyframes confettiFall {
+  0% {
+    top: -10%;
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    transform: rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Success Card */
+.success-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 48px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  animation: slideUp 0.6s ease-out;
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Success Icon */
+.success-icon-wrapper {
+  margin-bottom: 24px;
+  animation: iconPop 0.8s ease-out 0.3s both;
+}
+
+@keyframes iconPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-icon {
+  color: #48bb78;
+  filter: drop-shadow(0 4px 12px rgba(72, 187, 120, 0.3));
+}
+
+/* Typography */
+.success-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+}
+
+.success-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0 0 32px 0;
+}
+
+/* Purchase Summary Box */
+.purchase-summary-box {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 2px solid #e2e8f0;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+}
+
+.summary-icon {
+  color: #ffa500;
+}
+
+.amount-icon {
+  width: 32px;
+  height: 32px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-top: 4px;
+}
+
+.summary-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 20px 0;
+}
+
+/* Success Message */
+.success-message {
+  background: #e6ffed;
+  border: 2px solid #48bb78;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.success-message p {
+  margin: 0 0 8px 0;
+  color: #22543d;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.success-message p:last-child {
+  margin-bottom: 0;
+}
+
+/* Actions */
+.success-actions {
+  margin-bottom: 24px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Receipt Info */
+.receipt-info {
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.receipt-info small {
+  color: #a0aec0;
+  font-size: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .success-card {
+    padding: 32px 24px;
+  }
+
+  .success-title {
+    font-size: 28px;
+  }
+
+  .summary-value {
+    font-size: 20px;
+  }
+
+  .success-icon {
+    width: 60px;
+    height: 60px;
+  }
+}

@@ -161,3 +161,17 @@ export const purchaseTokens = async (amount) => {
   if (!res.ok) throw new Error(data.error || 'Failed to purchase tokens');
   return data;
 };
+
+export const buyTokens = async (tokens) => {
+    const token = getToken();
+    const res = await fetch(`${API_URL}/payment/createsession`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({tokens}),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to purchase tokens')
+    window.location.href = data.url; // ga naar Stripe checkout
+  };
