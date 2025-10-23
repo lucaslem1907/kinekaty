@@ -33,7 +33,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     e.preventDefault();
 
     try {
-      const res = await fetch('https://kinekaty.onrender.com/auth/register', {
+      const res = await fetch('https://kinekaty.onrender.com/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
