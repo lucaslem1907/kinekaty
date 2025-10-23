@@ -1,5 +1,5 @@
 // src/services/api.js
-const API_URL = 'http://localhost:4000/api';
+const API_URL = 'https://kinekaty.onrender.com';
 
 // Helper to get token
 const getToken = () => localStorage.getItem('token');
