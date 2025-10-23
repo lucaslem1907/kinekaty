@@ -19,13 +19,15 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
 }));
+
+app.use('/api/payment', paymentRoutes);
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/tokens', tokenRoutes);
-app.use('/api/payment', paymentRoutes);
 
 
 // basic health
