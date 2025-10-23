@@ -13,25 +13,6 @@ export default function LoginView({ onLogin, onSwitchToRegister }) {
     e.preventDefault();
     const success = await onLogin({ email, password, isAdmin });
     if (!success) setError('Invalid credentials or role');
-
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, isAdmin }),
-      });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || 'Login failed')
-      return;
-
-      // Pass token and user to parent
-      localStorage.setItem('token', data.token);
-      onLogin(data.user);
-      setError('');
-    } catch (err) {
-      setError(err.message);
-    }
   };
 
   return (
