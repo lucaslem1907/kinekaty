@@ -1,8 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const Stripe =  require('stripe')
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe =  require('stripe')
 
 
 const createSession = async(req,res) => {
@@ -45,7 +44,7 @@ const webhook = async (req,res) => {
     event = stripe.webhooks.constructEvent(
       req.body,
       sig, 
-      stripe)
+      process.env.STRIPE_SECRET_KEY)
     console.log(event)
     
         console.log('Verified event:', event.type);
