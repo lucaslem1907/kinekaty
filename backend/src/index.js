@@ -20,7 +20,14 @@ app.use(cors({
   credentials: true
 }));
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { webhook } = require('./controllers/paymentControllor');
 
+app.post(
+  '/api/payment/webhook',
+  express.raw({ type: 'application/json' }),
+  webhook
+);
 
 app.use(express.json());
 
@@ -29,9 +36,6 @@ app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/payment', paymentRoutes);
-
-// BUT important:
-app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf } }));
 
 
 // basic health
