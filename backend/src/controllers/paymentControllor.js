@@ -48,10 +48,11 @@ const webhook = async (req,res) => {
       sig, 
       process.env.STRIPE_WEBHOOK_SECRET);
     console.log(event)
-} catch (err) {
-    console.log("Webhook error:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+    
+        console.log('Verified event:', event.type);
+  } catch (err) {
+    console.log('Webhook error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);}
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;

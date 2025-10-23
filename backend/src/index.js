@@ -20,7 +20,6 @@ app.use(cors({
   credentials: true
 }));
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { webhook } = require('./controllers/paymentControllor');
 
 app.post(
