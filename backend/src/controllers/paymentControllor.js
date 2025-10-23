@@ -43,7 +43,10 @@ const webhook = async (req,res) => {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig, 
+      process.env.STRIPE_WEBHOOK_SECRET);
     console.log(event)
 } catch (err) {
     console.log("Webhook error:", err.message);
@@ -54,13 +57,15 @@ const webhook = async (req,res) => {
     const session = event.data.object;
     console.log(session)
     const userId = parseInt(session.metadata.userId);
-    const tokens = parseInt(session.metadata.tokens);
+    const tokens = parseInt(session.metadata.amount);
+
+    console.log ()
 
     const user = db.data.users.find(u => u.id === userId);
     if (user) {
       user.tokenBalance += tokens;
       await db.write();
-      console.log(`✅ ${tokens} tokens toegevoegd aan ${user.name}`);
+      console.log(`✅ ${amount} tokens toegevoegd aan ${userId}`);
     }
   }
 

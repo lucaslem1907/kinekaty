@@ -20,7 +20,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use('/api/payment', paymentRoutes);
+
 
 app.use(express.json());
 
@@ -28,6 +28,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/tokens', tokenRoutes);
+app.use('/api/payment', paymentRoutes);
+
+// BUT important:
+app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf } }));
 
 
 // basic health
