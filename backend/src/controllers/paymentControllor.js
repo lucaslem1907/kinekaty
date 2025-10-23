@@ -7,7 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
 const createSession = async(req,res) => {
-    const {tokens} = req.body;
+    const {userId} = req.user.id
+    const {amount, tokens} = req.body;
     try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -16,15 +17,17 @@ const createSession = async(req,res) => {
         {
           price_data: {
             currency: "eur",
-            product_data: { name: `${tokens} tokens` },
-            unit_amount: tokens * 100, // €1 per token
+            product_data: { 
+            name: `${amount} Euro`, 
+            description: `${tokens} Tokens`},
+            unit_amount: amount * 100, // €1 per token
           },
           quantity: 1,
         },
       ],
-      metadata: {tokens},
+      metadata: {amount,userId},
       success_url: `${process.env.FRONTEND_URL}/success`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      cancel_url: `${process.env.FRONTEND_URL}/client`,
     });
 
     res.json({ url: session.url });
@@ -35,12 +38,13 @@ const createSession = async(req,res) => {
 }
 
 const webhook = async (req,res) => {
-     const sig = req.headers["stripe-signature"];
+  
+  const sig = req.headers["stripe-signature"];
 
   let event;
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
- 
+    console.log(event)
 } catch (err) {
     console.log("Webhook error:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -48,6 +52,7 @@ const webhook = async (req,res) => {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
+    console.log(session)
     const userId = parseInt(session.metadata.userId);
     const tokens = parseInt(session.metadata.tokens);
 

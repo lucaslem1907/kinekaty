@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post('/createsession',auth, createSession);
 
-router.post('/webhook', auth, webhook)
+router.post('/webhook', express.raw({ type: 'application/json' }), webhook)
 
 module.exports = router;

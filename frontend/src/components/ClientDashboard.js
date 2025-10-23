@@ -29,7 +29,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
   };
 
   const confirmPurchase = () => {
-    onPurchaseTokens(selectedPackage.tokens);
+    onPurchaseTokens(selectedPackage.price, selectedPackage.tokens);
     setView('overview');
     setSelectedPackage(null);
   };

@@ -162,16 +162,18 @@ export const purchaseTokens = async (amount) => {
   return data;
 };
 
-export const buyTokens = async (tokens) => {
+export const buyTokens = async (amount, tokens) => {
     const token = getToken();
     const res = await fetch(`${API_URL}/payment/createsession`, {
       method: "POST",
       headers: { "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({tokens}),
+      body: JSON.stringify({amount, tokens}),
     });
+    
     const data = await res.json();
+    console.log (data)
     if (!res.ok) throw new Error(data.error || 'Failed to purchase tokens')
     window.location.href = data.url; // ga naar Stripe checkout
   };

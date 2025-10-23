@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "build": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
   "keywords": [
     "express",
-    "prisma",
+    "prisma", 
     "postgresql",
     "backend",
     "booking"

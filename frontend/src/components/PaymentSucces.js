@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle, Coins, ArrowRight, Home } from 'lucide-react';
 import '../styles/Payment.css';
 
-export default function PaymentSuccess({ amount}) {
+export default function PaymentSuccess({amount, onBack}) {
   const [confetti, setConfetti] = useState(true);
 
   useEffect(() => {
@@ -49,12 +49,12 @@ export default function PaymentSuccess({ amount}) {
           <p>Start booking classes now and enjoy your sessions!</p>
         </div>
 
-        {/*<div className="success-actions">
-          <button onClick={onContinue} className="btn btn-primary btn-large">
+        <div className="success-actions">
+          <button onClick={onBack} className="btn btn-primary btn-large">
             <Home size={20} />
             Back to Dashboard
           </button>
-        </div>*/}
+        </div>
 
         <div className="receipt-info">
           <small>

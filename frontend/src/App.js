@@ -114,12 +114,10 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handlePurchaseTokensSubmit = async (amount) => {
+  const handlePurchaseTokensSubmit = async (amount,tokens) => {
 
     try {
-      await buyTokens(amount);
-      alert(`Direct to stripe ${amount}`);
-
+      await buyTokens(amount,tokens);
       // Refetch tokens
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
       setTokens(updatedTokens);
@@ -155,6 +153,7 @@ export default function ClassBookingApp() {
           path="/success"
           element={
             <PaymentSuccess
+            onBack={() => navigate('/client')}
             />
           }
         />
