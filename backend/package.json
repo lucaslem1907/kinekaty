@@ -12,7 +12,7 @@
   },
   "keywords": [
     "express",
-    "prisma", 
+    "prisma",
     "postgresql",
     "backend",
     "booking"
@@ -20,6 +20,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@mollie/api-client": "^4.3.3",
     "@prisma/client": "^6.17.1",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",

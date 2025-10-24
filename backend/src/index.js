@@ -20,16 +20,8 @@ app.use(cors({
   credentials: true
 }));
 
-const { webhook } = require('./controllers/paymentControllor');
-
-app.post(
-  '/api/payment/webhook',
-  express.raw({ type: 'application/json' }),
-  webhook
-);
-
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
