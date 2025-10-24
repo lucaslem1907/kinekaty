@@ -27,7 +27,8 @@ app.post(
   express.raw({ type: 'application/json' }),
   webhook
 );
-console.log("Body type:", typeof req.body);
+
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
