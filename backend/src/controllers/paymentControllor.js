@@ -60,7 +60,7 @@ const webhook = async (req, res) => {
     console.log(session)
     const amount = parseInt(session.metadata.amount)
 
-    if (!userId || !amount) {
+    if (!amount) {
     console.warn("⚠️ Missing metadata in session:", session.metadata);
     return res.status(200).send("Missing metadata, ignored");
   }
