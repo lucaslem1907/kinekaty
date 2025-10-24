@@ -1,15 +1,13 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const Stripe =  require('stripe')
+const Stripe = require('stripe')
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-
-
-const createSession = async(req,res) => {
-    const {userId} = req.user.id
-    const {amount, tokens} = req.body;
-    try {
+const createSession = async (req, res) => {
+  const { userId } = req.user.id
+  const { amount, tokens } = req.body;
+  try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -17,15 +15,16 @@ const createSession = async(req,res) => {
         {
           price_data: {
             currency: "eur",
-            product_data: { 
-            name: `${amount} Euro`, 
-            description: `${tokens} Tokens`},
+            product_data: {
+              name: `${amount} Euro`,
+              description: `${tokens} Tokens`
+            },
             unit_amount: amount * 100, // €1 per token
           },
           quantity: 1,
         },
       ],
-      metadata: {amount,userId},
+      metadata: { amount, userId },
       success_url: `${process.env.FRONTEND_URL}/success`,
       cancel_url: `${process.env.FRONTEND_URL}/client`,
     });
@@ -37,8 +36,8 @@ const createSession = async(req,res) => {
   }
 }
 
-const webhook = async (req,res) => {
-  
+const webhook = async (req, res) => {
+
   const sig = req.headers["stripe-signature"];
   console.log("🔔 Stripe webhook hit", req.headers["stripe-signature"]);
 
@@ -46,31 +45,27 @@ const webhook = async (req,res) => {
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
-      sig, 
+      sig,
       process.env.STRIPE_WEBHOOK_SECRET)
     console.log(event)
     console.log('Verified event:', event.type);
   } catch (err) {
     console.log('Webhook error:', err.message);
-    return res.status(400 || 502).send(`Webhook Error: ${err.message}` 
-    );}
+    return res.status(400 || 502).send(`Webhook Error: ${err.message}`
+    );
+  }
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     console.log(session)
-    const userId = parseInt(session.metadata.userId);
-    const amount = parseInt(session.metadata.amount);
+    const amount = parseInt(session.metadata.amount)
 
-    const user = db.data.users.find(u => u.id === userId);
-    if (user) {
-      user.tokenBalance += amount;
-      await db.write();
-      console.log(`✅ ${amount} tokens toegevoegd aan ${userId}`);
-    }
+    if (!userId || !amount) {
+    console.warn("⚠️ Missing metadata in session:", session.metadata);
+    return res.status(200).send("Missing metadata, ignored");
   }
-
-  res.json({ received: true });
-
+    res.json({ received: true });
+  }
 }
 
-module.exports = {webhook,createSession}
+module.exports = { webhook, createSession }

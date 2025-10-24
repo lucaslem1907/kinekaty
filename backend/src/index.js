@@ -36,6 +36,10 @@ app.use('/api/bookings', bookingsRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/payment', paymentRoutes);
 
+app.use((err, req, res, next) => {
+  console.error("🔥 Unhandled error:", err);
+  res.status(500).send("Internal Server Error");
+});
 
 // basic health
 app.get('/api/health', (req, res) => res.json({ ok: true }));
