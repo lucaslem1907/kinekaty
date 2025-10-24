@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const mollie =  require('@mollie/api-client')
+const Mollie =  require('@mollie/api-client')
 
 export const mollie = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY })
 
