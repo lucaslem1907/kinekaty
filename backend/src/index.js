@@ -22,21 +22,14 @@ app.use(cors({
 
 const { webhook } = require('./controllers/paymentControllor');
 
-
-
-
-app.use((req, res, next) => {
-  if (req.originalUrl === "/api/payment/webhook") {
-    next(); // skip JSON parsing for this route
-  } else {
-    express.json()(req, res, next);
-  }
-});
 app.post(
   '/api/payment/webhook',
   express.raw({ type: 'application/json' }),
   webhook
 );
+console.log("Body type:", typeof req.body);
+app.use(express.json());
+
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);

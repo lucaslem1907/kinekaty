@@ -40,6 +40,7 @@ const createSession = async(req,res) => {
 const webhook = async (req,res) => {
   
   const sig = req.headers["stripe-signature"];
+  console.log("🔔 Stripe webhook hit", req.headers["stripe-signature"]);
 
   let event;
   try {
