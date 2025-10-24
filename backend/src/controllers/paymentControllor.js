@@ -1,15 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
-
+const {PrismaClient} = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const Mollie = require('@mollie/api-client')
 
 const mollie = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY })
 
-
-/**
- * Create a Mollie payment (replaces Stripe session)
- */
 const createSession = async (req, res) => {
   try {
     // ✅ If you’re using authentication middleware
@@ -55,7 +50,7 @@ const webhook = async (req, res) => {
 
     if (payment.isPaid()) {
       const { userId, tokens } = payment.metadata;
-      const user = db.data.users.find(u => u.id === parseInt(userId));
+      
 
       if (user) {
         user.tokenBalance += parseInt(tokens);
@@ -75,4 +70,4 @@ const webhook = async (req, res) => {
   }
 };
 
-module.exports = { createSession, webhook };
+module.exports = {createSession, webhook };
