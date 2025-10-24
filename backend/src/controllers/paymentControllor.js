@@ -4,6 +4,8 @@ const prisma = new PrismaClient();
 const Stripe = require('stripe')
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
+import { addTokensToUser } from './tokenController.js';
+
 const createSession = async (req, res) => {
   const { userId } = req.user.id
   const { amount, tokens } = req.body;
@@ -24,7 +26,7 @@ const createSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      metadata: { amount, tokens},
+      metadata: { amount, tokens,userId },
       success_url: `${process.env.FRONTEND_URL}/success?amount=${amount}&tokens=${tokens}`,
       cancel_url: `${process.env.FRONTEND_URL}/client`,
     });
@@ -57,13 +59,17 @@ const webhook = async (req, res) => {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    console.log(session)
-    const amount = parseInt(session.metadata.amount)
+    const amount = parseInt(session.metadata.amount);
+    const tokens = parseInt(session.metadata.tokens)
+    const userId = parseInt(session.metadata.userId);
 
-    if (!amount) {
-    console.warn("⚠️ Missing metadata in session:", session.metadata);
-    return res.status(200).send("Missing metadata, ignored");
-  }
+    await addTokensToUser(userId, tokens);
+
+
+    if (!amount || !tokens ) {
+      console.warn("⚠️ Missing metadata in session:", session.metadata);
+      return res.status(200).send("Missing metadata, ignored");
+    }
     res.json({ received: true });
   }
 }

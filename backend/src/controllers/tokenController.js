@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // ✅ Koop tokens
-const buyTokens = async (req, res) => {
+ export const addTokensToUser  = async (req, res) => {
   try {
     const userId = req.user.id;
     const { amount } = req.body;
