@@ -48,23 +48,21 @@ const webhook = async (req,res) => {
       sig, 
       process.env.STRIPE_WEBHOOK_SECRET)
     console.log(event)
-    
-        console.log('Verified event:', event.type);
+    console.log('Verified event:', event.type);
   } catch (err) {
     console.log('Webhook error:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);}
+    return res.status(400 || 502).send(`Webhook Error: ${err.message}` 
+    );}
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     console.log(session)
     const userId = parseInt(session.metadata.userId);
-    const tokens = parseInt(session.metadata.amount);
-
-    console.log ()
+    const amount = parseInt(session.metadata.amount);
 
     const user = db.data.users.find(u => u.id === userId);
     if (user) {
-      user.tokenBalance += tokens;
+      user.tokenBalance += amount;
       await db.write();
       console.log(`✅ ${amount} tokens toegevoegd aan ${userId}`);
     }
