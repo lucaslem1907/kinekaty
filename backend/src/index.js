@@ -26,7 +26,7 @@ const { webhook } = require('./controllers/paymentControllor');
 
 
 app.use((req, res, next) => {
-  if (req.originalUrl === "/webhook") {
+  if (req.originalUrl === "/api/payment/webhook") {
     next(); // skip JSON parsing for this route
   } else {
     express.json()(req, res, next);
