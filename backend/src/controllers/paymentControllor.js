@@ -1,9 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-const Mollie =  require('@mollie/api-client')
-
-export const mollie = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY })
+import Mollie from '@mollie/api-client';
+const mollie = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY })
 
 
 /**
@@ -74,4 +73,4 @@ const webhook = async (req, res) => {
   }
 };
 
-export { createSession, webhook };
+export default { createSession, webhook };
