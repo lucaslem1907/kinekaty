@@ -1,13 +1,17 @@
 // src/components/PaymentSuccess.js
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, Coins, ArrowRight, Home } from 'lucide-react';
+import { CheckCircle, Coins, Home } from 'lucide-react';
 import '../styles/Payment.css';
 
-export default function PaymentSuccess({amount, onBack}) {
+export default function PaymentSuccess({ onBack }) {
   const [confetti, setConfetti] = useState(true);
+  const [amount, setAmount] = useState(0);
+  const [tokens, setTokens] = useState(0);
 
   useEffect(() => {
-    // Hide confetti after animation
+    const params = new URLSearchParams(window.location.search);
+    setAmount(params.get('amount'));
+    setTokens(params.get('tokens'));
     const timer = setTimeout(() => setConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);
@@ -15,7 +19,6 @@ export default function PaymentSuccess({amount, onBack}) {
   return (
     <div className="payment-success-container">
       {confetti && <div className="confetti-animation"></div>}
-      
       <div className="success-card">
         <div className="success-icon-wrapper">
           <CheckCircle className="success-icon" size={80} />
@@ -29,7 +32,7 @@ export default function PaymentSuccess({amount, onBack}) {
             <Coins className="summary-icon" size={32} />
             <div>
               <div className="summary-label">Tokens Purchased</div>
-              <div className="summary-value">{amount} Tokens</div>
+              <div className="summary-value">{tokens}</div>
             </div>
           </div>
 
@@ -39,14 +42,13 @@ export default function PaymentSuccess({amount, onBack}) {
             <div className="amount-icon">€</div>
             <div>
               <div className="summary-label">Amount Paid</div>
-              {/*<div className="summary-value">€{amountPaid}</div>*/}
+              <div className="summary-value">€{amount}</div>
             </div>
           </div>
         </div>
 
         <div className="success-message">
           <p>✨ You're all set! Your tokens are ready to use.</p>
-          <p>Start booking classes now and enjoy your sessions!</p>
         </div>
 
         <div className="success-actions">
@@ -57,9 +59,7 @@ export default function PaymentSuccess({amount, onBack}) {
         </div>
 
         <div className="receipt-info">
-          <small>
-            Receipt sent to your email • Transaction ID: {Date.now()}
-          </small>
+          <small>Receipt sent to your email • Transaction ID: {Date.now()}</small>
         </div>
       </div>
     </div>

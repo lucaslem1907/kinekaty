@@ -24,8 +24,8 @@ const createSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      metadata: { amount, userId },
-      success_url: `${process.env.FRONTEND_URL}/success`,
+      metadata: { amount, tokens},
+      success_url: `${process.env.FRONTEND_URL}/success?amount=${amount}&tokens=${tokens}`,
       cancel_url: `${process.env.FRONTEND_URL}/client`,
     });
 
