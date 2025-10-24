@@ -1,73 +1,76 @@
-const {PrismaClient} = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const createMollieClient = require('@mollie/api-client')
+const Stripe =  require('stripe')
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-const mollie = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY })
 
-const createSession = async (req, res) => {
-  try {
-    // ✅ If you’re using authentication middleware
-    const userId = req.user?.id || req.body.userId;
-    const { amount, tokens } = req.body;
 
-    // Create Mollie payment
-    const payment = await mollie.payments.create({
-      amount: {
-        value: amount.toFixed(2), // must be string, e.g. "10.00"
-        currency: 'EUR',
-      },
-      description: `${tokens} tokens for €${amount}`,
-      redirectUrl: `${process.env.FRONTEND_URL}/success?userId=${userId}`,
-      webhookUrl: `${process.env.BACKEND_URL}/webhook`, // your Render URL
-      metadata: {
-        userId,
-        amount,
-        tokens,
-      },
+const createSession = async(req,res) => {
+    const {userId} = req.user.id
+    const {amount, tokens} = req.body;
+    try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: { 
+            name: `${amount} Euro`, 
+            description: `${tokens} Tokens`},
+            unit_amount: amount * 100, // €1 per token
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {amount,userId},
+      success_url: `${process.env.FRONTEND_URL}/success`,
+      cancel_url: `${process.env.FRONTEND_URL}/client`,
     });
 
-    console.log(`✅ Mollie payment created: ${payment.id}`);
-
-    res.json({ url: payment.getCheckoutUrl() });
+    res.json({ url: session.url });
   } catch (err) {
-    console.error('❌ Mollie createSession error:', err);
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
-};
+}
 
-/**
- * Mollie Webhook
- * Called by Mollie when payment status changes
- */
-const webhook = async (req, res) => {
+const webhook = async (req,res) => {
+  
+  const sig = req.headers["stripe-signature"];
+  console.log("🔔 Stripe webhook hit", req.headers["stripe-signature"]);
+
+  let event;
   try {
-    const paymentId = req.body.id; // Mollie sends "id" field
-    console.log('🔔 Mollie webhook hit:', paymentId);
-
-    // Fetch payment details
-    const payment = await mollie.payments.get(paymentId);
-
-    if (payment.isPaid()) {
-      const { userId, tokens } = payment.metadata;
-      
-
-      if (user) {
-        user.tokenBalance += parseInt(tokens);
-        await db.write();
-        console.log(`✅ ${tokens} tokens added to user ${userId}`);
-      } else {
-        console.warn(`⚠️ User ${userId} not found`);
-      }
-    } else {
-      console.log(`ℹ️ Payment ${paymentId} not paid yet (status: ${payment.status})`);
-    }
-
-    res.status(200).send('OK');
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig, 
+      process.env.STRIPE_WEBHOOK_SECRET)
+    console.log(event)
+    console.log('Verified event:', event.type);
   } catch (err) {
-    console.error('❌ Mollie webhook error:', err);
-    res.status(500).send('Webhook failed');
-  }
-};
+    console.log('Webhook error:', err.message);
+    return res.status(400 || 502).send(`Webhook Error: ${err.message}` 
+    );}
 
-module.exports = {createSession, webhook };
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    console.log(session)
+    const userId = parseInt(session.metadata.userId);
+    const amount = parseInt(session.metadata.amount);
+
+    const user = db.data.users.find(u => u.id === userId);
+    if (user) {
+      user.tokenBalance += amount;
+      await db.write();
+      console.log(`✅ ${amount} tokens toegevoegd aan ${userId}`);
+    }
+  }
+
+  res.json({ received: true });
+
+}
+
+module.exports = {webhook,createSession}
