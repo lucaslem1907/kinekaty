@@ -73,7 +73,7 @@ export default function ClassBookingApp() {
     fetchBookings(parsedUser.isAdmin).then(setBookings).catch(() => setBookings([]));
     fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
   }
-}, [currentUser]);
+}, []);
 
   // ---------------- CLASS HANDLERS ----------------
   const handleCreateClassSubmit = async (classData) => {
