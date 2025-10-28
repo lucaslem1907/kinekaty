@@ -68,7 +68,7 @@ export default function ClassBookingApp() {
   if (token && storedUser) {
     const parsedUser = JSON.parse(storedUser);
     setCurrentUser(parsedUser);
-    console.log(parsedUser)
+    
 
     fetchUsers().then(setUsers).catch(() => setUsers([]));
     fetchClasses().then(setClasses).catch(() => setClasses([]));
@@ -76,6 +76,7 @@ export default function ClassBookingApp() {
     fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
   }
 }, [currentUser]);
+console.log(parsedUser)
 
   // ---------------- CLASS HANDLERS ----------------
   const handleCreateClassSubmit = async (classData) => {
