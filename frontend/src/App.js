@@ -39,7 +39,7 @@ export default function ClassBookingApp() {
       const data = await loginUser(userData);
       setCurrentUser(data.user);
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
       navigate(data.user.isAdmin ? '/admin' : '/client');
     } catch (err) {
       alert(err.message);
