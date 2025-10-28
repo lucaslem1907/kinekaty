@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const Stripe = require('stripe')
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-import { addTokensToUser } from './tokenController.js';
+const { addTokensToUser } = require('./tokenController');
 
 const createSession = async (req, res) => {
   const { userId } = req.user.id
@@ -26,7 +26,7 @@ const createSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      metadata: { amount, tokens,userId },
+      metadata: { amount, tokens, userId },
       success_url: `${process.env.FRONTEND_URL}/success?amount=${amount}&tokens=${tokens}`,
       cancel_url: `${process.env.FRONTEND_URL}/client`,
     });
