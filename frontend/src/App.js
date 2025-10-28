@@ -69,10 +69,11 @@ export default function ClassBookingApp() {
     const parsedUser = JSON.parse(storedUser);
     setCurrentUser(parsedUser);
     console.log(parsedUser)
+
     fetchUsers().then(setUsers).catch(() => setUsers([]));
     fetchClasses().then(setClasses).catch(() => setClasses([]));
-    fetchBookings(currentUser.isAdmin).then(setBookings).catch(() => setBookings([]));
-    fetchTokens(currentUser.isAdmin).then(setTokens).catch(() => setTokens([]));
+    fetchBookings(parsedUser.isAdmin).then(setBookings).catch(() => setBookings([]));
+    fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
   }
 }, [currentUser]);
 
