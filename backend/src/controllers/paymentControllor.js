@@ -7,8 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 const {addTokensToUserHelper} = require('./tokenController');
 
 const createSession = async (req, res) => {
-  const { userId } = req.user.id
-  const { amount, tokens } = req.body;
+  const { amount, tokens, userId } = req.body;
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
