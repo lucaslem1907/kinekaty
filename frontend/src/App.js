@@ -48,7 +48,8 @@ export default function ClassBookingApp() {
 
   const handleLogout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('token');
+    localStorage.removeItem('token')
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -67,7 +68,7 @@ export default function ClassBookingApp() {
   if (token && storedUser) {
     const parsedUser = JSON.parse(storedUser);
     setCurrentUser(parsedUser);
-
+    console.log(parsedUser)
     fetchUsers().then(setUsers).catch(() => setUsers([]));
     fetchClasses().then(setClasses).catch(() => setClasses([]));
     fetchBookings(currentUser.isAdmin).then(setBookings).catch(() => setBookings([]));
