@@ -76,7 +76,7 @@ export default function ClassBookingApp() {
     fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
   }
 }, [currentUser]);
-console.log(parsedUser)
+console.log(currentUser)
 
   // ---------------- CLASS HANDLERS ----------------
   const handleCreateClassSubmit = async (classData) => {
