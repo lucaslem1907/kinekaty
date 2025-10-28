@@ -128,7 +128,7 @@ export default function ClassBookingApp() {
 
   // ---------------- PROTECTED ROUTES ----------------
   useEffect(() => {
-    const protectedPaths = ['/admin', '/client', '/calendar', '/class-edit','/success'];
+    const protectedPaths = ['/admin', '/client', '/calendar', '/class-edit'];
     if (!currentUser && protectedPaths.includes(window.location.pathname)) {
       navigate('/login', { replace: true });
     }
