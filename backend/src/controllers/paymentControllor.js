@@ -59,6 +59,7 @@ const webhook = async (req, res) => {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
+    console.log('Full session metadata:', JSON.stringify(session.metadata, null, 2));
     const amount = parseInt(session.metadata.amount);
     const tokens = parseInt(session.metadata.tokens)
     const userId = parseInt(session.metadata.userId);
