@@ -39,6 +39,7 @@ export default function ClassBookingApp() {
       const data = await loginUser(userData);
       setCurrentUser(data.user);
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', data.user);
       navigate(data.user.isAdmin ? '/admin' : '/client');
     } catch (err) {
       alert(err.message);
@@ -60,13 +61,19 @@ export default function ClassBookingApp() {
 
   // ---------------- FETCH DATA ----------------
   useEffect(() => {
-    if (!currentUser) return;
+  const token = localStorage.getItem("token");
+  const storedUser = localStorage.getItem("user");
+
+  if (token && storedUser) {
+    const parsedUser = JSON.parse(storedUser);
+    setCurrentUser(parsedUser);
 
     fetchUsers().then(setUsers).catch(() => setUsers([]));
     fetchClasses().then(setClasses).catch(() => setClasses([]));
-    fetchBookings(currentUser.isAdmin).then(setBookings).catch(() => setBookings([]));
-    fetchTokens(currentUser.isAdmin).then(setTokens).catch(() => setTokens([]));
-  }, [currentUser]);
+    fetchBookings(parsedUser.isAdmin).then(setBookings).catch(() => setBookings([]));
+    fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
+  }
+}, []);
 
   // ---------------- CLASS HANDLERS ----------------
   const handleCreateClassSubmit = async (classData) => {
@@ -114,10 +121,10 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handlePurchaseTokensSubmit = async (amount,tokens) => {
+  const handlePurchaseTokensSubmit = async (amount, tokens) => {
 
     try {
-      await buyTokens(currentUser.id, amount,tokens);
+      await buyTokens(currentUser.id, amount, tokens);
       // Refetch tokens
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
       setTokens(updatedTokens);
@@ -153,7 +160,7 @@ export default function ClassBookingApp() {
           path="/success"
           element={
             <PaymentSuccess
-            onBack={() => navigate('/client')}
+              onBack={() => navigate('/client')}
             />
           }
         />
@@ -226,7 +233,7 @@ export default function ClassBookingApp() {
                 onDelete={handleDeleteClassSubmit}
                 onBack={() => navigate('/admin')}
               />
-            ) : <Navigate to="/admin"/>
+            ) : <Navigate to="/admin" />
           }
         />
       </Routes>

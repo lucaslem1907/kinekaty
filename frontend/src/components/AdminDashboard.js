@@ -47,22 +47,23 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
     const clientUsers = users.filter(u => !u.isAdmin);
 
     const sum_tokens = () => {
-    let sum = 0;
-    for (let i = 0; i < tokens.length; i++) {
-        sum += tokens[i].tokenBalance;
-     };
-    return sum
-    console.log("total tokens: ", sum);
-}
-const total= sum_tokens()
-    
+        let sum = 0;
+        for (let i = 0; i < tokens.length; i++) {
+            sum += tokens[i].tokenBalance;
+        };
+        console.log("total tokens: ", sum);
+        return sum
+
+    }
+    const total = sum_tokens()
+
     return (
         <div className="dashboard-container">
             {/* Header */}
             <header className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title">Admin Dashboard</h1>
-                    <p className="dashboard-subtitle">Welcome back, {currentUser ? currentUser.name: "Loading"}</p>
+                    <p className="dashboard-subtitle">Welcome back, {currentUser ? currentUser.name : "Loading"}</p>
                 </div>
                 <button onClick={onLogout} className="btn btn-danger">
                     <LogOut size={18} />
@@ -75,7 +76,7 @@ const total= sum_tokens()
                 <div className="stat-card">
                     <div>
                         <div className="stat-value">{classes.length}</div>
-                        
+
 
                         <div className="stat-label">Total Classes</div>
                     </div>
@@ -101,7 +102,7 @@ const total= sum_tokens()
                 <div className="stat-card">
                     <div>
                         <div className="stat-value">{total}</div>
-                        
+
                         <div className="stat-label">Active Tokens</div>
                     </div>
                     <Coins size={48} style={{ color: '#ffa500', opacity: 0.3 }} />
@@ -242,7 +243,7 @@ const total= sum_tokens()
                                             <h3 className="class-title">{cls.title}</h3>
                                             <p className="class-description">{cls.description}</p>
                                             <div className="class-details">
-                                                <span><Calendar size={14} /> {formatDate( cls.date)}</span>
+                                                <span><Calendar size={14} /> {formatDate(cls.date)}</span>
                                                 <span>⏰ {cls.time} ({cls.duration} min)</span>
                                                 <span>📍 {cls.location}</span>
                                             </div>
