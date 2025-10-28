@@ -117,7 +117,7 @@ export default function ClassBookingApp() {
   const handlePurchaseTokensSubmit = async (amount,tokens) => {
 
     try {
-      await buyTokens(amount,tokens);
+      await buyTokens(currentUser.id, amount,tokens);
       // Refetch tokens
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
       setTokens(updatedTokens);

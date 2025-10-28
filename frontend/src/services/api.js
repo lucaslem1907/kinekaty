@@ -162,14 +162,14 @@ export const purchaseTokens = async (amount) => {
   return data;
 };
 
-export const buyTokens = async (amount, tokens) => {
+export const buyTokens = async (userId, amount, tokens) => {
     const token = getToken();
     const res = await fetch(`${API_URL}/payment/createsession`, {
       method: "POST",
       headers: { "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({amount, tokens}),
+      body: JSON.stringify({userId, amount, tokens}),
     });
     
     const data = await res.json();
