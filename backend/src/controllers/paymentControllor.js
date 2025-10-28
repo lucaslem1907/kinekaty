@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const Stripe = require('stripe')
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-const { addTokensToUser } = require('./tokenController');
+const {addTokensToUserHelper} = require('./tokenController');
 
 const createSession = async (req, res) => {
   const { userId } = req.user.id
@@ -63,7 +63,7 @@ const webhook = async (req, res) => {
     const tokens = parseInt(session.metadata.tokens)
     const userId = parseInt(session.metadata.userId);
 
-    await addTokensToUser(userId, tokens);
+    await addTokensToUserHelper(userId, tokens);
 
 
     if (!amount || !tokens ) {

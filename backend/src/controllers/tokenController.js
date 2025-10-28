@@ -2,28 +2,36 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // ✅ Koop tokens
- const addTokensToUser  = async (req, res) => {
+const addTokensToUser = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id; // comes from auth middleware
     const { amount } = req.body;
 
-    if (!amount || amount <= 0)
-      return res.status(400).json({ error: 'Invalid token amount' });
-
-    const transaction = await prisma.tokenTransaction.create({
-      data: {
-        userId,
-        amount: Number(amount),
-        type: 'purchase',
-      },
-    });
-
+    const transaction = await addTokensToUserHelper(userId, amount);
     res.status(201).json({ message: 'Tokens purchased successfully', transaction });
   } catch (err) {
     console.error('Error buying tokens:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+//HELPER
+const addTokensToUserHelper = async (userId, amount) => {
+  if (!userId || !amount || amount <= 0) {
+    throw new Error('Invalid userId or token amount');
+  }
+
+  const transaction = await prisma.tokenTransaction.create({
+    data: {
+      userId: Number(userId),
+      amount: Number(amount),
+      type: 'purchase',
+    },
+  });
+
+  return transaction;
+};
+
 
 // ✅ Gebruik tokens (bijv. bij boeken)
 const useTokens = async (req, res) => {
@@ -116,4 +124,4 @@ const getUserTokens = async (req, res) => {
 
 
 
-module.exports = { addTokensToUser, useTokens, getUserTokens, getAllUserTokens };
+module.exports = { addTokensToUser,addTokensToUserHelper, useTokens, getUserTokens, getAllUserTokens };
