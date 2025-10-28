@@ -70,10 +70,10 @@ export default function ClassBookingApp() {
 
     fetchUsers().then(setUsers).catch(() => setUsers([]));
     fetchClasses().then(setClasses).catch(() => setClasses([]));
-    fetchBookings(parsedUser.isAdmin).then(setBookings).catch(() => setBookings([]));
-    fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
+    fetchBookings(currentUser.isAdmin).then(setBookings).catch(() => setBookings([]));
+    fetchTokens(currentUser.isAdmin).then(setTokens).catch(() => setTokens([]));
   }
-}, []);
+}, [currentUser]);
 
   // ---------------- CLASS HANDLERS ----------------
   const handleCreateClassSubmit = async (classData) => {
