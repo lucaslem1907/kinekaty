@@ -23,12 +23,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '22.x'
-# 3️⃣ Install & Build frontend (React)
-      - name: Install and build frontend
-        run: |
-          cd frontend
-          npm install
-          CI=false npm run build
 
       # 4️⃣ Install backend dependencies
       - name: Install backend dependencies
@@ -36,21 +30,13 @@ jobs:
           cd backend
           npm install
 
-      # 5️⃣ Copy frontend build to backend (optional for serving frontend via backend)
-      - name: Copy frontend build into backend
-        run: |
-          rm -rf backend/build
-          mkdir -p backend/build
-          cp -r frontend/build/* backend/build/
-
       # 6️⃣ Login to Azure
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6a8e1574-55e9-4d03-80d0-647bc864a5bc }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_a7f7a165-642c-4dde-81e6-01d3f82e16f1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8ccf6d7c-0529-4ac6-ae20-ead30f7b05b8 }}
-
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB0E27E8FED54513A988F09EBCB21954 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D427735105674B0CBBBFDA7D5246B9EF }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8CCF6D7C05294AC6AE20EAD30F7B05B8 }}
 
       # 7️⃣ Deploy backend to Azure
       - name: Deploy backend to Azure Web App
