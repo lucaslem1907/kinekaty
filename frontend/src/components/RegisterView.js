@@ -12,7 +12,6 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     address: '',
     city: '',
     zipCode: '',
-    isAdmin: isAdmin
   });
   const [success, setSuccess] = useState(false);
 
@@ -41,17 +40,16 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
         throw new Error(data.error || 'Registration failed');
 
       setSuccess(true);
-      setError('');
 
       setTimeout(() => {
         onSwitchToLogin();
       }, 1500);
     } catch (err) {
-      setError(err.message);
+      console.log(err.message);
     }
   };
   // paid service, so using free geolocation API (Nominatim)
-  /*const handleGetLocation = () => {
+  const handleGetLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -88,7 +86,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     } else {
       alert('Geolocation is not supported by your browser.');
     }
-  };*/
+  };
 
   if (success) {
     return (
