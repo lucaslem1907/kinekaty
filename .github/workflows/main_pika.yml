@@ -32,7 +32,11 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
+<<<<<<< HEAD
           name: backend
+=======
+          name: node-app
+>>>>>>> 0d8a9006c8fe05122b6a849e9524579e64d0a882
           path: backend
 
   deploy:
