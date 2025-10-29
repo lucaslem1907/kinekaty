@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
-
+const path = require('path'); 
 const prisma = new PrismaClient();
 
 const authRoutes = require('./routes/auth');
@@ -36,6 +36,12 @@ app.use('/api/bookings', bookingsRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/payment', paymentRoutes);
 
+app.use(express.static(path.join(__dirname, '../build')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
+
+//error handler
 app.use((err, req, res, next) => {
   console.error("🔥 Unhandled error:", err);
   res.status(500).send("Internal Server Error");
