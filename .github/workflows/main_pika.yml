@@ -62,5 +62,8 @@ jobs:
           app-name: 'pika'
           slot-name: 'Production'
           package: .
+          take-app-offline: true
+          
+
 
           
