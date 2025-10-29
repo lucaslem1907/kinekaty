@@ -18,7 +18,6 @@ import {
   updateClass,
   deleteClass,
   bookClass,
-  purchaseTokens,
   buyTokens
 } from './services/api';
 import './styles/App.css';

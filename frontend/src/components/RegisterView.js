@@ -4,7 +4,6 @@ import '../styles/Auth.css';
 
 export default function RegisterView({ onRegister, onSwitchToLogin }) {
   const [step, setStep] = useState(1);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,7 +14,6 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     zipCode: '',
     isAdmin: isAdmin
   });
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleInputChange = (field, value) => {
@@ -53,7 +51,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     }
   };
   // paid service, so using free geolocation API (Nominatim)
-  const handleGetLocation = () => {
+  /*const handleGetLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -90,7 +88,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     } else {
       alert('Geolocation is not supported by your browser.');
     }
-  };
+  };*/
 
   if (success) {
     return (
