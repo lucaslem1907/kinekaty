@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend
-          path: backend
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -62,8 +62,6 @@ jobs:
           app-name: 'pika'
           slot-name: 'Production'
           package: .
-          take-app-offline: true
-          
 
 
           
