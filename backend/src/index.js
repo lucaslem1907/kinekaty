@@ -44,7 +44,7 @@ app.get('*', (req, res) => {
 //error handler
 app.use((err, req, res, next) => {
   console.error("🔥 Unhandled error:", err);
-  res.status(500).send("Internal Server Error");
+  res.status(500).send("Internal Server Error 2.0");
 });
 
 // basic health
