@@ -49,7 +49,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     }
   };
   // paid service, so using free geolocation API (Nominatim)
-  const handleGetLocation = () => {
+  /*const handleGetLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -86,7 +86,7 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
     } else {
       alert('Geolocation is not supported by your browser.');
     }
-  };
+  };*/
 
   if (success) {
     return (

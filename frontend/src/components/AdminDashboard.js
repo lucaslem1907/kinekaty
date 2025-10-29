@@ -6,7 +6,6 @@ import { formatDate } from '../utils/helpers';
 
 export default function AdminDashboard({ currentUser, classes, users, bookings, tokens, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [error, setError] = useState('');
     const [newClass, setNewClass] = useState({
         title: '',
         date: '',
@@ -34,7 +33,6 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
             capacity: '',
             description: ''
         });
-        setError('');
         setShowCreateForm(false);
         alert('Class created successfully!');
 
