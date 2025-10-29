@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "postinstall": "prisma generate",
     "build": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
@@ -21,7 +22,6 @@
   "license": "MIT",
   "dependencies": {
     "@mollie/api-client": "^4.3.3",
-    
     "@prisma/client": "^6.17.1",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
