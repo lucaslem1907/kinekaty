@@ -18,6 +18,7 @@
     "backend",
     "booking"
   ],
+  
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
