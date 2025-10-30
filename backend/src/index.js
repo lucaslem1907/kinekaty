@@ -11,16 +11,17 @@ const tokenRoutes = require('./routes/token');
 const paymentRoutes = require ('./routes/payment');
 
 const app = express();
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 8080
 
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL || '*',
   credentials: true
 }));
 
 const { webhook } = require('./controllers/paymentControllor');
 
+// Webhook must be BEFORE express.json()
 app.post(
   '/api/payment/webhook',
   express.raw({ type: 'application/json' }),
@@ -29,6 +30,7 @@ app.post(
 
 app.use(express.json());
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classesRoutes);
 app.use('/api/bookings', bookingsRoutes);
@@ -39,11 +41,18 @@ app.use('/api/payment', paymentRoutes);
 //error handler
 app.use((err, req, res, next) => {
   console.error("🔥 Unhandled error:", err);
-  res.status(500).send("Internal Server Error 2.0");
+ res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
 });
 
 // basic health
-app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/health', (req, res) => res.json({ 
+  ok: true,
+  timestamp: new Date().toISOString(),
+  environment: process.env.NODE_ENV 
+}));
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
@@ -51,3 +60,21 @@ app.listen(PORT, () => {
 
 // Test route
 app.get('/', (req, res) => res.send('Backend is running!'));
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server listening on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});

@@ -4,12 +4,10 @@
   "description": "Backend for Class Booking App using Express and PostgreSQL",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "postinstall": "prisma generate",
-    "build": "prisma generate",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "dev": "nodemon src/index.js",
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma generate"
   },
   "keywords": [
     "express",
@@ -20,7 +18,8 @@
   ],
   "author": "Your Name",
   "engines": {
-    "node": ">=18"
+    "node": "22.x",
+    "npm": ">=9.0.0"
   },
   "license": "MIT",
   "dependencies": {
