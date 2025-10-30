@@ -12,8 +12,6 @@ const paymentRoutes = require ('./routes/payment');
 
 const app = express();
 const PORT = process.env.PORT || 8080
-const PORT = process.env.PORT || 8080
-
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
@@ -63,15 +61,15 @@ app.get('/api/health', (req, res) => res.json({
   environment: process.env.NODE_ENV 
 }));
 
-const server = app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server listening on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
-
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use.`);
-    process.exit(1); // stop process
+    process.exit(1);
   } else {
     console.error(err);
   }
@@ -85,33 +83,9 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM signal received: closing HTTP server');
   await prisma.$disconnect();
   process.exit(0);
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server listening on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM signal received: closing HTTP server');
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server listening on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
