@@ -54,8 +54,18 @@ app.get('/api/health', (req, res) => res.json({
   environment: process.env.NODE_ENV 
 }));
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
+});
+
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use.`);
+    process.exit(1); // stop process
+  } else {
+    console.error(err);
+  }
 });
 
 // Test route
