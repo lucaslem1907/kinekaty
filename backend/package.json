@@ -18,8 +18,7 @@
   ],
   "author": "Your Name",
   "engines": {
-    "node": "20.x",
-    "npm": ">=9.0.0"
+    "node": ">=18"
   },
   "license": "MIT",
   "dependencies": {
