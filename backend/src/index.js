@@ -41,7 +41,7 @@ app.use('/api/payment', paymentRoutes);
 //error handler
 app.use((err, req, res, next) => {
   console.error("🔥 Unhandled error:", err);
- res.status(500).json({ 
+ res.status(502).json({ 
     error: 'Internal Server Error',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
   });
