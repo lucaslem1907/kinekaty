@@ -1,0 +1,6 @@
+@KinekatyApi_HostAddress = http://localhost:5162
+
+GET {{KinekatyApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
