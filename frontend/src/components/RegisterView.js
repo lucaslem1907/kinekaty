@@ -35,9 +35,10 @@ export default function RegisterView({ onRegister, onSwitchToLogin }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
       if (!res.ok)
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data.error || data.message || `Registration failed (${res.status})`);
 
       setSuccess(true);
 
