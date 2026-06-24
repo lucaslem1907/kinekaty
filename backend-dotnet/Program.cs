@@ -8,23 +8,16 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database (Supabase / PostgreSQL) ──────────────────────────────────────────
-// Npgsql expects key-value format. Convert postgres:// URI automatically if needed.
+// NpgsqlConnectionStringBuilder natively parses both postgres:// URIs and key-value strings.
 var rawConn = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured");
 
-var connectionString = rawConn.StartsWith("postgres://") || rawConn.StartsWith("postgresql://")
-    ? ConvertPostgresUri(rawConn)
-    : rawConn;
-
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
-
-static string ConvertPostgresUri(string uri)
+var csb = new Npgsql.NpgsqlConnectionStringBuilder(rawConn)
 {
-    var u        = new Uri(uri);
-    var userInfo = u.UserInfo.Split(':', 2);
-    var db       = u.AbsolutePath.TrimStart('/');
-    return $"Host={u.Host};Port={u.Port};Database={db};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-}
+    SslMode = Npgsql.SslMode.Require
+};
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(csb.ConnectionString));
 
 // ── JWT Authentication ────────────────────────────────────────────────────────
 var jwtKey      = builder.Configuration["Jwt:Key"]      ?? throw new InvalidOperationException("Jwt:Key not configured");
