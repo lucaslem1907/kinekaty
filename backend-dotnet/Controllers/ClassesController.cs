@@ -18,9 +18,8 @@ public class ClassesController(AppDbContext db) : ControllerBase
         var classes = await db.Classes
             .Include(c => c.Bookings)
             .OrderBy(c => c.Date)
-            .Select(c => ToDto(c))
             .ToListAsync();
-        return Ok(classes);
+        return Ok(classes.Select(ToDto));
     }
 
     // POST /api/classes

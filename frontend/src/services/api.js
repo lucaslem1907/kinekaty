@@ -11,9 +11,10 @@ export const loginUser = async ({ email, password, isAdmin }) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, isAdmin }),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Login failed');
-  return data; // return user info + token
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : {};
+  if (!res.ok) throw new Error(data.error || data.message || `Login failed (${res.status})`);
+  return data;
 };
 
 
