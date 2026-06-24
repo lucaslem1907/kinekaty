@@ -8,26 +8,15 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database (Supabase / PostgreSQL) ──────────────────────────────────────────
-var rawHost = builder.Configuration["DB_HOST"] ?? throw new InvalidOperationException("DB_HOST not configured");
-// Strip tcp:// or any scheme prefix Render may inject
-var cleanHost = rawHost.Replace("tcp://", "").Replace("http://", "").Replace("https://", "").Split(':')[0];
-
 var csb = new Npgsql.NpgsqlConnectionStringBuilder
 {
-    Host     = cleanHost,
+    Host     = builder.Configuration["DB_HOST"]     ?? throw new InvalidOperationException("DB_HOST not configured"),
     Port     = int.Parse(builder.Configuration["DB_PORT"] ?? "5432"),
     Database = builder.Configuration["DB_NAME"]     ?? "postgres",
     Username = builder.Configuration["DB_USER"]     ?? "postgres",
     Password = builder.Configuration["DB_PASSWORD"] ?? throw new InvalidOperationException("DB_PASSWORD not configured"),
     SslMode  = Npgsql.SslMode.Require
 };
-
-// Render resolves Supabase hostnames to IPv6 first, but Supabase only accepts IPv4.
-// Pre-resolve to IPv4 so Npgsql never tries the IPv6 address.
-var ipv4 = System.Net.Dns.GetHostAddresses(cleanHost)
-    .FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
-if (ipv4 != null)
-    csb.Host = ipv4.ToString();
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(csb.ConnectionString));
 
