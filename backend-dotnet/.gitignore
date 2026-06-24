@@ -1,0 +1,16 @@
+# Build output
+bin/
+obj/
+
+# Local secrets / env
+appsettings.Development.json
+appsettings.json
+*.user
+
+# Visual Studio
+.vs/
+
+# EF Core temp
+*.db
+*.db-shm
+*.db-wal
