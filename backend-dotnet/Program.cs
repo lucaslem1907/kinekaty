@@ -8,9 +8,13 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database (Supabase / PostgreSQL) ──────────────────────────────────────────
+var rawHost = builder.Configuration["DB_HOST"] ?? throw new InvalidOperationException("DB_HOST not configured");
+// Strip tcp:// or any scheme prefix Render may inject
+var cleanHost = rawHost.Replace("tcp://", "").Replace("http://", "").Replace("https://", "").Split(':')[0];
+
 var csb = new Npgsql.NpgsqlConnectionStringBuilder
 {
-    Host     = builder.Configuration["DB_HOST"]     ?? throw new InvalidOperationException("DB_HOST not configured"),
+    Host     = cleanHost,
     Port     = int.Parse(builder.Configuration["DB_PORT"] ?? "5432"),
     Database = builder.Configuration["DB_NAME"]     ?? "postgres",
     Username = builder.Configuration["DB_USER"]     ?? "postgres",
