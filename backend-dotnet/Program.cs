@@ -22,6 +22,13 @@ var csb = new Npgsql.NpgsqlConnectionStringBuilder
     SslMode  = Npgsql.SslMode.Require
 };
 
+// Render resolves Supabase hostnames to IPv6 first, but Supabase only accepts IPv4.
+// Pre-resolve to IPv4 so Npgsql never tries the IPv6 address.
+var ipv4 = System.Net.Dns.GetHostAddresses(cleanHost)
+    .FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+if (ipv4 != null)
+    csb.Host = ipv4.ToString();
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(csb.ConnectionString));
 
 // ── JWT Authentication ────────────────────────────────────────────────────────
