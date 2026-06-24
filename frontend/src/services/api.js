@@ -16,6 +16,7 @@ export const loginUser = async ({ email, password, isAdmin }) => {
   return data; // return user info + token
 };
 
+
 // ----------------REGISTER-----------------
 /*export const RegisterUser = async () => {
     e.preventDefault();
