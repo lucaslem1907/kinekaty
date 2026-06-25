@@ -31,7 +31,7 @@ export default function ClassBookingApp() {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [bookings, setBookings] = useState([]);
-  const [tokens, setTokens] = useState([]);
+  const [tokens, setTokens] = useState(null);
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedUser,  setSelectedUser]  = useState(null);
@@ -48,6 +48,11 @@ export default function ClassBookingApp() {
       setCurrentUser(data.user);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      // Fetch all data immediately so dashboard has everything on first render
+      fetchClasses().then(setClasses).catch(() => setClasses([]));
+      fetchBookings(data.user.isAdmin).then(setBookings).catch(() => setBookings([]));
+      fetchTokens(data.user.isAdmin).then(setTokens).catch(() => setTokens(null));
+      if (data.user.isAdmin) fetchUsers().then(setUsers).catch(() => setUsers([]));
       navigate(data.user.isAdmin ? '/admin' : '/client');
     } catch (err) {
       showToast(err.message, 'error');

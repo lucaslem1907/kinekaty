@@ -17,31 +17,6 @@ export const loginUser = async ({ email, password, isAdmin }) => {
   return data;
 };
 
-
-// ----------------REGISTER-----------------
-/*export const RegisterUser = async () => {
-    e.preventDefault();
-
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || 'Registration failed');
-
-      setSuccess(true);
-      setError('');
-
-      setTimeout(() => {
-        onSwitchToLogin();
-      }, 1500);
-    } catch (err) {
-      setError(err.message);
-    }
-  };*/
 // ---------------- CLASSES ----------------
 export const fetchClasses = async () => {
   const res = await fetch(`${API_URL}/classes`);

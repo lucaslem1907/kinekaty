@@ -54,7 +54,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
           <Coins size={32} className="token-icon" />
           <div>
             <h3 className="token-label"> Available Tokens</h3>
-            <p className="token-value">{tokens.totalTokens}</p>
+            <p className="token-value">{tokens === null ? '…' : tokens.totalTokens ?? 0}</p>
           </div>
         </div>
         <button onClick={() => setView('buy-tokens')} className="btn btn-success">
@@ -149,6 +149,10 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                         <button className="btn btn-secondary btn-block" disabled>
                           Class Full
                         </button>
+                      ) : tokens === null ? (
+                        <button className="btn btn-secondary btn-block" disabled>
+                          Loading...
+                        </button>
                       ) : (tokens.totalTokens ?? 0) < cls.tokenCost ? (
                         <button className="btn btn-danger btn-block" disabled>
                           Not Enough Tokens
@@ -222,6 +226,8 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                             <button className="btn btn-success" disabled>✓ Booked</button>
                           ) : isFull ? (
                             <button className="btn btn-secondary" disabled>Full</button>
+                          ) : tokens === null ? (
+                            <button className="btn btn-secondary" disabled>Loading...</button>
                           ) : (tokens.totalTokens ?? 0) < cls.tokenCost ? (
                             <button className="btn btn-danger" disabled>No Tokens</button>
                           ) : (
