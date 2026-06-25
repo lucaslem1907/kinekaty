@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
-import { Calendar, LogIn } from 'lucide-react';
-import '../styles/Auth.css';
-
+﻿import React, { useState } from "react";
+import { Calendar, LogIn } from "lucide-react";
+import "../styles/Auth.css";
 
 export default function LoginView({ onLogin, onSwitchToRegister }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
     const success = await onLogin({ email, password, isAdmin });
-    if (!success) setError('Invalid credentials or role');
+    setLoading(false);
+    if (!success) setError("Invalid credentials or role");
   };
 
   return (
@@ -31,6 +34,7 @@ export default function LoginView({ onLogin, onSwitchToRegister }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
 
           <label>Password</label>
@@ -39,6 +43,7 @@ export default function LoginView({ onLogin, onSwitchToRegister }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={loading}
           />
 
           <div className="checkbox-row">
@@ -46,20 +51,27 @@ export default function LoginView({ onLogin, onSwitchToRegister }) {
               type="checkbox"
               checked={isAdmin}
               onChange={(e) => setIsAdmin(e.target.checked)}
+              disabled={loading}
             />
             <label>Login as Administrator</label>
           </div>
 
           {error && <p className="error-text">{error}</p>}
 
-          <button type="submit" className="btn-primary">
-            <LogIn className="icon-small" /> Login
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? (
+              <span className="login-loading">
+                <span className="spinner" /> Logging in...
+              </span>
+            ) : (
+              <><LogIn className="icon-small" /> Login</>
+            )}
           </button>
         </form>
 
         <div className="switch-auth">
           <button onClick={onSwitchToRegister}>
-            Don’t have an account? Register here
+            Don&#x27;t have an account? Register here
           </button>
         </div>
       </div>

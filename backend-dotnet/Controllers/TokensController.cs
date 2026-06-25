@@ -55,18 +55,28 @@ public class TokensController(AppDbContext db) : ControllerBase
         return Ok(new { userId, totalTokens = balance, transactions = history });
     }
 
-    // GET /api/tokens/all
+    // GET /api/tokens/all  — returns per-user token balance summary
     [HttpGet("all")]
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetAllTokens()
     {
-        var transactions = (await db.TokenTransactions
-            .Include(t => t.User)
-            .OrderByDescending(t => t.CreatedAt)
-            .ToListAsync())
-            .Select(ToDto)
-            .ToList();
-        return Ok(transactions);
+        var users = await db.Users
+            .Where(u => !u.IsAdmin)
+            .ToListAsync();
+
+        var allTransactions = await db.TokenTransactions.ToListAsync();
+
+        var summary = users.Select(u => new
+        {
+            id           = u.Id,
+            name         = u.Name,
+            email        = u.Email,
+            tokenBalance = allTransactions
+                .Where(t => t.UserId == u.Id)
+                .Sum(t => t.Amount)
+        }).ToList();
+
+        return Ok(summary);
     }
 
     private async Task<int> GetBalance(int userId) =>

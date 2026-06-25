@@ -8,6 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 import CalendarView from './components/CalendarView';
 import ClassEditView from './components/ClassEditView';
 import PaymentSuccess from './components/PaymentSucces';
+import Toast from './components/Toast';
 import {
   loginUser,
   fetchClasses,
@@ -29,6 +30,9 @@ export default function ClassBookingApp() {
   const [tokens, setTokens] = useState([]);
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
+  const [toast, setToast] = useState({ message: '', type: 'info' });
+  const showToast = (message, type = 'info') => setToast({ message, type });
+  const hideToast = () => setToast({ message: '', type: 'info' });
 
   const navigate = useNavigate();
 
@@ -41,11 +45,11 @@ export default function ClassBookingApp() {
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate(data.user.isAdmin ? '/admin' : '/client');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout
     setCurrentUser(null);
     localStorage.removeItem('token')
     localStorage.removeItem('user');
@@ -79,27 +83,30 @@ export default function ClassBookingApp() {
     try {
       const newClass = await createClass(classData);
       setClasses(prev => [...prev, newClass]);
+      showToast('Class created successfully!', 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  const handleUpdateClassSubmit = async (updatedClass) => {
+  const handleUpdateClassSubmit
     try {
       const newClass = await updateClass(updatedClass.id, updatedClass);
       setClasses(prev => prev.map(c => (c.id === newClass.id ? newClass : c)));
+      showToast('Class updated!', 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  const handleDeleteClassSubmit = async (classId) => {
+  const handleDeleteClassSubmit
     try {
       await deleteClass(classId);
       setClasses(prev => prev.filter(c => c.id !== classId));
       setBookings(prev => prev.filter(b => b.classId !== classId));
+      showToast('Class deleted.', 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -114,19 +121,20 @@ export default function ClassBookingApp() {
     try {
       const data = await bookClass(classId, currentUser.id, currentUser.name);
       setBookings(prev => [...prev, data.booking]);
-      alert(data.message);
+      showToast(data.message || 'Booking confirmed!', 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  const handlePurchaseTokensSubmit = async (amount) => {
+  const handlePurchaseTokensSubmit
     try {
       await purchaseTokens(amount);
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
       setTokens(updatedTokens);
+      showToast('Tokens purchased!', 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -140,6 +148,7 @@ export default function ClassBookingApp() {
 
   return (
     <div className="app-background">
+      <Toast message={toast.message} type={toast.type} onClose={hideToast} />
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
 

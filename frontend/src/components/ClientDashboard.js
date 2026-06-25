@@ -28,7 +28,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
   };
 
   const confirmPurchase = () => {
-    onPurchaseTokens(selectedPackage.price, selectedPackage.tokens);
+    onPurchaseTokens(selectedPackage.tokens, selectedPackage.price);
     setView('overview');
     setSelectedPackage(null);
   };
