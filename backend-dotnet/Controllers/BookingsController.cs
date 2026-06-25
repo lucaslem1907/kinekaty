@@ -79,6 +79,45 @@ public class BookingsController(AppDbContext db) : ControllerBase
         return Ok(bookings);
     }
 
+    // DELETE /api/bookings/{id}
+    // Admin: can always cancel, tokens refunded to the client.
+    // Client: can only cancel their own booking if the class is > 48 h away.
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> CancelBooking(int id)
+    {
+        var callerId = GetUserId();
+        var isAdmin  = User.HasClaim("isAdmin", "true");
+
+        var booking = await db.Bookings
+            .Include(b => b.Class)
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (booking is null) return NotFound(new { error = "Booking not found" });
+
+        if (!isAdmin && booking.UserId != callerId)
+            return Forbid();
+
+        if (!isAdmin)
+        {
+            var hoursUntilClass = (booking.Class.Date - DateTime.UtcNow).TotalHours;
+            if (hoursUntilClass < 48)
+                return BadRequest(new { error = "Cancellations must be made at least 48 hours before the class." });
+        }
+
+        // Refund tokens to the client
+        var refund = new TokenTransaction
+        {
+            UserId = booking.UserId,
+            Amount = booking.Class.TokenCost,
+            Type   = "refund"
+        };
+        db.TokenTransactions.Add(refund);
+        db.Bookings.Remove(booking);
+        await db.SaveChangesAsync();
+
+        return Ok(new { message = "Booking cancelled and tokens refunded." });
+    }
+
     private int GetUserId() =>
         int.Parse(User.FindFirstValue("sub")
             ?? throw new UnauthorizedAccessException("User ID not found in token"));

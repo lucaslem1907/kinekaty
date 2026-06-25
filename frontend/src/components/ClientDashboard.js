@@ -3,7 +3,7 @@ import { LogOut, Calendar, Clock, MapPin, Coins, Search, ShoppingCart } from 'lu
 import { formatDate, formatTime, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
 import '../styles/Dashboard.css';
 
-export default function ClientDashboard({ currentUser, classes, bookings, tokens, onBookClass, onPurchaseTokens, onLogout }) {
+export default function ClientDashboard({ currentUser, classes, bookings, tokens, onBookClass, onCancelBooking, onPurchaseTokens, onLogout }) {
   const [view, setView] = useState('overview');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPackage, setSelectedPackage] = useState(null);
@@ -247,7 +247,6 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
             <h2 className="card-title">My Bookings</h2>
 
             {bookings.length === 0 ? (
-              console.log('No bookings found for user:', bookings.id),
               <p className="text-muted">You haven't booked any classes yet. Browse available classes to get started!</p>
             ) : (
               <div className="bookings-list">
@@ -255,10 +254,16 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                   const cls = classes.find(c => c.id === booking.classId);
                   if (!cls) return null;
 
+                  const hoursUntil   = (new Date(cls.date) - Date.now()) / 36e5;
+                  const canCancel    = hoursUntil > 48;
+                  const isPast       = hoursUntil < 0;
+
                   return (
-                    <div key={bookings.id} className="booking-card">
+                    <div key={booking.id} className="booking-card">
                       <div className="booking-status">
-                        <span className="badge badge-success">Confirmed</span>
+                        <span className={`badge ${isPast ? 'badge-secondary' : 'badge-success'}`}>
+                          {isPast ? 'Past' : 'Confirmed'}
+                        </span>
                       </div>
                       <h3 className="class-title">{cls.title}</h3>
                       <p className="class-description">{cls.description}</p>
@@ -272,8 +277,27 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                           Booked on {new Date(booking.bookedAt).toLocaleDateString()}
                         </small>
                         <span className="token-used">
-                          <Coins size={14} /> 1 token used
+                          <Coins size={14} /> {cls.tokenCost} token{cls.tokenCost !== 1 ? 's' : ''} used
                         </span>
+                        {!isPast && (
+                          canCancel ? (
+                            <button
+                              className="btn btn-danger"
+                              style={{ fontSize: '12px', padding: '4px 10px' }}
+                              onClick={() => {
+                                if (window.confirm(`Cancel "${cls.title}"? You will receive ${cls.tokenCost} token(s) back.`)) {
+                                  onCancelBooking(booking.id);
+                                }
+                              }}
+                            >
+                              Cancel booking
+                            </button>
+                          ) : (
+                            <span className="text-muted" style={{ fontSize: '12px' }}>
+                              ⚠ Cannot cancel — less than 48h before class
+                            </span>
+                          )
+                        )}
                       </div>
                     </div>
                   );

@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { ArrowLeft, Edit2, Save, X, Calendar, Clock, MapPin, Users, Coins, Trash2, Mail, Phone } from 'lucide-react';
 import { formatDate, formatTime } from '../utils/helpers';
 import '../styles/ClassEdit.css';
+import Toast from './Toast';
 
-export default function ClassEditView({ classes, users, bookings, tokens, onSave, onDelete, onBack }) {
+export default function ClassEditView({ classes, users, bookings, tokens, onSave, onDelete, onRemoveBooking, onBack }) {
   const [isEditing, setIsEditing] = useState(true);
   const [editedClass, setEditedClass] = useState({ ...classes });
   const [activeTab, setActiveTab] = useState('details');
@@ -56,10 +57,9 @@ export default function ClassEditView({ classes, users, bookings, tokens, onSave
     }
   };
 
-  const handleRemoveBooking = (bookingId) => {
-    if (window.confirm('Remove this booking? The client will need to be notified manually.')) {
-      // This would call a function to remove the booking
-      alert('Booking removed (implement backend connection)');
+  const handleRemoveBooking = async (bookingId) => {
+    if (window.confirm('Remove this booking? The client will receive a token refund.')) {
+      if (onRemoveBooking) await onRemoveBooking(bookingId);
     }
   };
   const handleExportToCSV = () => {
@@ -128,7 +128,7 @@ export default function ClassEditView({ classes, users, bookings, tokens, onSave
     // Note: Using BCC to protect privacy - all emails hidden from each other
     window.location.href = `mailto:?bcc=${emails}&subject=${subject}&body=${body}`;
 
-    alert(`Opening email client to send to ${bookingsWithUsers.length} participants.\n\nNote: All emails will be BCC'd to protect privacy.`);
+    Toast(`Opening email client to send to ${bookingsWithUsers.length} participants.\n\nNote: All emails will be BCC'd to protect privacy.`);
   };
   return (
     <div className="class-edit-container">

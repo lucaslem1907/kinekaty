@@ -20,6 +20,7 @@ import {
   updateClass,
   deleteClass,
   bookClass,
+  cancelBooking,
   purchaseTokens,
   updateUser,
   deleteUser
@@ -172,6 +173,18 @@ const handlePurchaseTokensSubmit = async (amount) => {
     }
   };
 
+  const handleCancelBookingSubmit = async (bookingId) => {
+    try {
+      await cancelBooking(bookingId);
+      setBookings(prev => prev.filter(b => b.id !== bookingId));
+      const updatedTokens = await fetchTokens(currentUser.isAdmin);
+      setTokens(updatedTokens);
+      showToast('Booking cancelled and tokens refunded.', 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
   // ---------------- PROTECTED ROUTES ----------------
   useEffect(() => {
     const protectedPaths = ['/admin', '/client', '/calendar', '/class-edit'];
@@ -244,6 +257,7 @@ const handlePurchaseTokensSubmit = async (amount) => {
               bookings={bookings}
               tokens={tokens}
               onBookClass={handleBookClassSubmit}
+              onCancelBooking={handleCancelBookingSubmit}
               onPurchaseTokens={handlePurchaseTokensSubmit}
               onLogout={handleLogout}
             />
@@ -272,6 +286,7 @@ const handlePurchaseTokensSubmit = async (amount) => {
                 tokens={tokens}
                 onSave={handleUpdateClassSubmit}
                 onDelete={handleDeleteClassSubmit}
+                onRemoveBooking={handleCancelBookingSubmit}
                 onBack={() => navigate('/admin')}
               />
             ) : <Navigate to="/admin" />

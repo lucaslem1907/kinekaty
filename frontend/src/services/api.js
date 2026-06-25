@@ -119,6 +119,17 @@ export const bookClass = async (classId, userId, userName) => {
   return data;
 };
 
+export const cancelBooking = async (bookingId) => {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/bookings/${bookingId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to cancel booking');
+  return json;
+};
+
 // ---------------- USERS ----------------
 export const fetchUsers = async () => {
   const token = getToken();
