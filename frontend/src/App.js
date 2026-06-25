@@ -89,7 +89,7 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handleUpdateClassSubmit
+    const handleUpdateClassSubmit = async (updatedClass) => {   
     try {
       const newClass = await updateClass(updatedClass.id, updatedClass);
       setClasses(prev => prev.map(c => (c.id === newClass.id ? newClass : c)));
@@ -99,7 +99,7 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handleDeleteClassSubmit
+    const handleDeleteClassSubmit = async (classId) => {
     try {
       await deleteClass(classId);
       setClasses(prev => prev.filter(c => c.id !== classId));
