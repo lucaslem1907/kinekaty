@@ -260,7 +260,11 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                   const cls = classes.find(c => c.id === booking.classId);
                   if (!cls) return null;
 
-                  const hoursUntil   = (new Date(cls.date) - Date.now()) / 36e5;
+                  // Combine date + time into one moment for accurate past/future check
+                  const [hours, minutes] = (cls.time || '00:00').split(':').map(Number);
+                  const classStart = new Date(cls.date);
+                  classStart.setHours(hours, minutes, 0, 0);
+                  const hoursUntil   = (classStart - Date.now()) / 36e5;
                   const canCancel    = hoursUntil > 48;
                   const isPast       = hoursUntil < 0;
 
