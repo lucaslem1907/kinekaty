@@ -46,12 +46,13 @@ public class TokensController(AppDbContext db) : ControllerBase
     {
         var userId  = GetUserId();
         var balance = await GetBalance(userId);
-        var history = await db.TokenTransactions
+        var history = (await db.TokenTransactions
             .Where(t => t.UserId == userId)
             .OrderByDescending(t => t.CreatedAt)
-            .Select(t => ToDto(t))
-            .ToListAsync();
-        return Ok(new { userId, balance, history });
+            .ToListAsync())
+            .Select(ToDto)
+            .ToList();
+        return Ok(new { userId, totalTokens = balance, transactions = history });
     }
 
     // GET /api/tokens/all
@@ -59,11 +60,12 @@ public class TokensController(AppDbContext db) : ControllerBase
     [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> GetAllTokens()
     {
-        var transactions = await db.TokenTransactions
+        var transactions = (await db.TokenTransactions
             .Include(t => t.User)
             .OrderByDescending(t => t.CreatedAt)
-            .Select(t => ToDto(t))
-            .ToListAsync();
+            .ToListAsync())
+            .Select(ToDto)
+            .ToList();
         return Ok(transactions);
     }
 

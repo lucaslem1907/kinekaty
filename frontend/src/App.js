@@ -18,7 +18,7 @@ import {
   updateClass,
   deleteClass,
   bookClass,
-  buyTokens
+  purchaseTokens
 } from './services/api';
 import './styles/App.css';
 
@@ -67,7 +67,7 @@ export default function ClassBookingApp() {
   if (token && storedUser) {
     const parsedUser = JSON.parse(storedUser);
     setCurrentUser(parsedUser);
-    fetchUsers().then(setUsers).catch(() => setUsers([]));
+    if (parsedUser.isAdmin) fetchUsers().then(setUsers).catch(() => setUsers([]));
     fetchClasses().then(setClasses).catch(() => setClasses([]));
     fetchBookings(parsedUser.isAdmin).then(setBookings).catch(() => setBookings([]));
     fetchTokens(parsedUser.isAdmin).then(setTokens).catch(() => setTokens([]));
@@ -120,11 +120,9 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handlePurchaseTokensSubmit = async (amount, tokens) => {
-
+  const handlePurchaseTokensSubmit = async (amount) => {
     try {
-      await buyTokens(currentUser.id, amount, tokens);
-      // Refetch tokens
+      await purchaseTokens(amount);
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
       setTokens(updatedTokens);
     } catch (err) {
