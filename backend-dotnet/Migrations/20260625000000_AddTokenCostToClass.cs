@@ -4,10 +4,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace KinekatyApi.Migrations
 {
-    /// <inheritdoc />
     public partial class AddTokenCostToClass : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
@@ -18,7 +16,6 @@ namespace KinekatyApi.Migrations
                 defaultValue: 1);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

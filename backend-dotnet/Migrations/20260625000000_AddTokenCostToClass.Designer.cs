@@ -15,7 +15,6 @@ namespace KinekatyApi.Migrations
     [Migration("20260625000000_AddTokenCostToClass")]
     partial class AddTokenCostToClass
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -30,27 +29,16 @@ namespace KinekatyApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<DateTime>("BookedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
+                    b.Property<int>("ClassId").HasColumnType("integer");
+                    b.Property<int>("UserId").HasColumnType("integer");
                     b.HasKey("Id");
-
                     b.HasIndex("ClassId");
-
-                    b.HasIndex("UserId", "ClassId")
-                        .IsUnique();
-
+                    b.HasIndex("UserId", "ClassId").IsUnique();
                     b.ToTable("Bookings");
                 });
 
@@ -59,44 +47,22 @@ namespace KinekatyApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Capacity")
-                        .HasColumnType("integer");
-
+                    b.Property<int>("Capacity").HasColumnType("integer");
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Time")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
+                    b.Property<DateTime>("Date").HasColumnType("timestamp with time zone");
+                    b.Property<string>("Description").HasColumnType("text");
+                    b.Property<int>("Duration").HasColumnType("integer");
+                    b.Property<string>("Location").IsRequired().HasColumnType("text");
+                    b.Property<string>("Time").IsRequired().HasColumnType("text");
+                    b.Property<string>("Title").IsRequired().HasColumnType("text");
                     b.Property<int>("TokenCost")
                         .HasDefaultValue(1)
                         .HasColumnType("integer");
-
                     b.HasKey("Id");
-
                     b.ToTable("Classes");
                 });
 
@@ -105,28 +71,16 @@ namespace KinekatyApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer");
-
+                    b.Property<int>("Amount").HasColumnType("integer");
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
+                    b.Property<string>("Type").IsRequired().HasColumnType("text");
+                    b.Property<int>("UserId").HasColumnType("integer");
                     b.HasKey("Id");
-
                     b.HasIndex("UserId");
-
                     b.ToTable("TokenTransactions");
                 });
 
@@ -135,88 +89,50 @@ namespace KinekatyApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .HasColumnType("text");
-
+                    b.Property<string>("City").HasColumnType("text");
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("Number")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Street")
-                        .HasColumnType("text");
-
+                    b.Property<string>("Email").IsRequired().HasColumnType("text");
+                    b.Property<bool>("IsAdmin").HasColumnType("boolean");
+                    b.Property<string>("Name").IsRequired().HasColumnType("text");
+                    b.Property<int?>("Number").HasColumnType("integer");
+                    b.Property<string>("Password").IsRequired().HasColumnType("text");
+                    b.Property<string>("Phone").HasColumnType("text");
+                    b.Property<string>("Street").HasColumnType("text");
                     b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
+                    b.HasIndex("Email").IsUnique();
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("KinekatyApi.Models.Booking", b =>
                 {
                     b.HasOne("KinekatyApi.Models.Class", "Class")
-                        .WithMany("Bookings")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
+                        .WithMany("Bookings").HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade).IsRequired();
                     b.HasOne("KinekatyApi.Models.User", "User")
-                        .WithMany("Bookings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
+                        .WithMany("Bookings").HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade).IsRequired();
                     b.Navigation("Class");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("KinekatyApi.Models.TokenTransaction", b =>
                 {
                     b.HasOne("KinekatyApi.Models.User", "User")
-                        .WithMany("Tokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
+                        .WithMany("Tokens").HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade).IsRequired();
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("KinekatyApi.Models.Class", b =>
-                {
-                    b.Navigation("Bookings");
-                });
+                { b.Navigation("Bookings"); });
 
             modelBuilder.Entity("KinekatyApi.Models.User", b =>
                 {
                     b.Navigation("Bookings");
-
                     b.Navigation("Tokens");
                 });
 #pragma warning restore 612, 618
