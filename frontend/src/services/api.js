@@ -59,8 +59,10 @@ export const createClass = async (classData) => {
     },
     body: JSON.stringify(classData),
   });
-  if (!res.ok) throw new Error('Failed to create class');
-  return res.json();
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : {};
+  if (!res.ok) throw new Error(data.error || data.title || `Failed to create class (${res.status})`);
+  return data;
 };
 
 export const updateClass = async (classId, updatedData) => {
