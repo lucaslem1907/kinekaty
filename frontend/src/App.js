@@ -119,9 +119,9 @@ export default function ClassBookingApp() {
   // ---------------- BOOKING & TOKENS ----------------
   const handleBookClassSubmit = async (classId) => {
     try {
-      const data = await bookClass(classId, currentUser.id, currentUser.name);
-      setBookings(prev => [...prev, data.booking]);
-      showToast(data.message || 'Booking confirmed!', 'success');
+      const booking = await bookClass(classId, currentUser.id, currentUser.name);
+      setBookings(prev => [...prev, booking]);
+      showToast('Booking confirmed!', 'success');
     } catch (err) {
       showToast(err.message, 'error');
     }
