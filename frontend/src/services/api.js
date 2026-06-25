@@ -105,18 +105,7 @@ export const fetchBookings = async (isAdmin) => {
 export const bookClass = async (classId, userId, userName) => {
   const token = getToken();
 
-  // deduct token
-  const tokenRes = await fetch(`${API_URL}/tokens/use`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({amount: 1}),
-  });
-  if (!tokenRes.ok) throw new Error('Failed to deduct token');
-
-  // create booking
+  // Token deduction is handled atomically by the backend on booking
   const res = await fetch(`${API_URL}/bookings`, {
     method: 'POST',
     headers: {

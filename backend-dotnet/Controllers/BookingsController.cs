@@ -29,6 +29,18 @@ public class BookingsController(AppDbContext db) : ControllerBase
         if (await db.Bookings.AnyAsync(b => b.UserId == userId && b.ClassId == req.ClassId))
             return Conflict(new { error = "Already booked this class" });
 
+        // Check token balance
+        var balance = await db.TokenTransactions
+            .Where(t => t.UserId == userId)
+            .SumAsync(t => (int?)t.Amount) ?? 0;
+
+        if (balance < cls.TokenCost)
+            return BadRequest(new { error = $"Insufficient tokens. This class costs {cls.TokenCost} token(s), you have {balance}." });
+
+        // Deduct tokens and create booking atomically
+        var tx = new TokenTransaction { UserId = userId, Amount = -cls.TokenCost, Type = "use" };
+        db.TokenTransactions.Add(tx);
+
         var booking = new Booking { UserId = userId, ClassId = req.ClassId };
         db.Bookings.Add(booking);
         await db.SaveChangesAsync();

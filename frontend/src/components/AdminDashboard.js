@@ -13,13 +13,25 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
         duration: '',
         location: '',
         capacity: '',
-        description: ''
+        description: '',
+        tokenCost: '1'
     });
 
     const handleCreateClass = async (e) => {
         e.preventDefault();
 
-        onCreateClass(newClass);
+        const payload = {
+            title:       newClass.title,
+            description: newClass.description,
+            date:        new Date(newClass.date).toISOString(),
+            time:        newClass.time,
+            duration:    parseInt(newClass.duration, 10),
+            location:    newClass.location,
+            capacity:    parseInt(newClass.capacity, 10),
+            tokenCost:   parseInt(newClass.tokenCost || '1', 10),
+        };
+
+        onCreateClass(payload);
         setNewClass({
             title: '',
             date: '',
@@ -27,7 +39,8 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
             duration: '',
             location: '',
             capacity: '',
-            description: ''
+            description: '',
+            tokenCost: '1'
         });
         setShowCreateForm(false);
     };
@@ -197,6 +210,19 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                                 />
                             </div>
 
+                            <div className="form-group">
+                                <label className="form-label">Token Cost *</label>
+                                <input
+                                    type="number"
+                                    value={newClass.tokenCost}
+                                    onChange={(e) => handleInputChange('tokenCost', e.target.value)}
+                                    className="form-input"
+                                    placeholder="1"
+                                    min="1"
+                                    required
+                                />
+                            </div>
+
 
 
                             <div className="form-group">
@@ -243,6 +269,9 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                                         <div className="class-list-actions">
                                             <span className="badge badge-primary">
                                                 {classBookings.length}/{cls.capacity} booked
+                                            </span>
+                                            <span className="badge badge-secondary" style={{ marginTop: '4px' }}>
+                                                {cls.tokenCost} token{cls.tokenCost !== 1 ? 's' : ''}
                                             </span>
                                             <button
                                                 onClick={(e) => {
