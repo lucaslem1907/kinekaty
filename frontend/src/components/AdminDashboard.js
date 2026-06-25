@@ -12,8 +12,6 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
         time: '',
         duration: '',
         location: '',
-        latitude: 50.8503,
-        longitude: 4.3517,
         capacity: '',
         description: ''
     });
@@ -28,14 +26,10 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
             time: '',
             duration: '',
             location: '',
-            latitude: 50.8503,
-            longitude: 4.3517,
             capacity: '',
             description: ''
         });
         setShowCreateForm(false);
-        alert('Class created successfully!');
-
     };
 
     const handleInputChange = (field, value) => {

@@ -1,13 +1,16 @@
-using System.Text;
+﻿using System.Text;
 using KinekatyApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+// Npgsql: accept DateTime with Kind=Unspecified as UTC (avoids "timestamp with time zone" errors)
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Database (Supabase / PostgreSQL) ──────────────────────────────────────────
+// -- Database (Supabase / PostgreSQL) --
 var csb = new Npgsql.NpgsqlConnectionStringBuilder
 {
     Host     = builder.Configuration["DB_HOST"]     ?? throw new InvalidOperationException("DB_HOST not configured"),
@@ -20,7 +23,7 @@ var csb = new Npgsql.NpgsqlConnectionStringBuilder
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(csb.ConnectionString));
 
-// ── JWT Authentication ────────────────────────────────────────────────────────
+// -- JWT Authentication --
 var jwtKey      = builder.Configuration["Jwt:Key"]      ?? throw new InvalidOperationException("Jwt:Key not configured");
 var jwtIssuer   = builder.Configuration["Jwt:Issuer"]   ?? "KinekatyApi";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "KinekatyApi";
@@ -28,7 +31,7 @@ var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "KinekatyApi";
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.MapInboundClaims = false;   // keep 'sub' and 'isAdmin' as-is
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer           = true,
@@ -42,20 +45,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ── Authorization — AdminOnly policy ─────────────────────────────────────────
+// -- Authorization --
 builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireClaim("isAdmin", "true")));
 
-// ── CORS ──────────────────────────────────────────────────────────────────────
+// -- CORS --
+// Build allowed origins list — always include localhost for local dev
+var allowedOrigins = new List<string> { "http://localhost:3000", "http://localhost:5173" };
+var frontendUrl = builder.Configuration["Frontend:Url"];
+if (!string.IsNullOrWhiteSpace(frontendUrl))
+    allowedOrigins.Add(frontendUrl.TrimEnd('/'));
+
+Console.WriteLine($"[CORS] Allowed origins: {string.Join(", ", allowedOrigins)}");
+
 builder.Services.AddCors(options =>
-    options.AddDefaultPolicy(policy =>
-        policy.WithOrigins(builder.Configuration["Frontend:Url"] ?? "http://localhost:3000")
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins([.. allowedOrigins])
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()));
 
-// ── Controllers + Swagger ─────────────────────────────────────────────────────
+// -- Controllers + Swagger --
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -82,20 +93,28 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ── Migrate + seed on startup ─────────────────────────────────────────────────
+// -- Migrate + seed on startup --
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-    await Seeder.SeedAsync(db);
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+        await Seeder.SeedAsync(db);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[STARTUP] DB migration/seed failed: {ex.Message}");
+    }
 }
 
-// ── Middleware pipeline ───────────────────────────────────────────────────────
-// Swagger always enabled — accessible on Render at /swagger
+// -- Middleware pipeline --
+// CORS must be first so OPTIONS preflight requests get headers before auth runs
+app.UseCors("AllowFrontend");
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -108,4 +127,3 @@ app.MapGet("/api/health", () => Results.Ok(new
 }));
 
 app.Run();
-
