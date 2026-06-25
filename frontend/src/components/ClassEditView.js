@@ -357,30 +357,6 @@ export default function ClassEditView({ classes, users, bookings, tokens, onSave
                     </small>
                   </div>
                 </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Latitude</label>
-                    <input
-                      type="number"
-                      step="0.0001"
-                      value={editedClass.latitude}
-                      onChange={(e) => handleInputChange('latitude', parseFloat(e.target.value))}
-                      className="form-input"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Longitude</label>
-                    <input
-                      type="number"
-                      step="0.0001"
-                      value={editedClass.longitude}
-                      onChange={(e) => handleInputChange('longitude', parseFloat(e.target.value))}
-                      className="form-input"
-                    />
-                  </div>
-                </div>
               </div>
             )}
 

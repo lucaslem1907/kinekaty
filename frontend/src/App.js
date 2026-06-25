@@ -7,6 +7,7 @@ import RegisterView from './components/RegisterView';
 import AdminDashboard from './components/AdminDashboard';
 import CalendarView from './components/CalendarView';
 import ClassEditView from './components/ClassEditView';
+import UserEditView from './components/UserEditView';
 import PaymentSuccess from './components/PaymentSucces';
 import Toast from './components/Toast';
 import {
@@ -19,7 +20,9 @@ import {
   updateClass,
   deleteClass,
   bookClass,
-  purchaseTokens
+  purchaseTokens,
+  updateUser,
+  deleteUser
 } from './services/api';
 import './styles/App.css';
 
@@ -30,6 +33,7 @@ export default function ClassBookingApp() {
   const [tokens, setTokens] = useState([]);
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
+  const [selectedUser,  setSelectedUser]  = useState(null);
   const [toast, setToast] = useState({ message: '', type: 'info' });
   const showToast = (message, type = 'info') => setToast({ message, type });
   const hideToast = () => setToast({ message: '', type: 'info' });
@@ -116,6 +120,34 @@ export default function ClassBookingApp() {
     navigate('/class-edit');
   };
 
+  const handleViewUser = (userId) => {
+    const userToView = users.find(u => u.id === userId);
+    setSelectedUser(userToView);
+    navigate('/user-edit');
+  };
+
+  const handleUpdateUserSubmit = async (userData) => {
+    try {
+      const updated = await updateUser(userData.id, userData);
+      setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+      setSelectedUser(updated);
+      showToast('User updated!', 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleDeleteUserSubmit = async (userId) => {
+    try {
+      await deleteUser(userId);
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      setBookings(prev => prev.filter(b => b.userId !== userId));
+      showToast('User deleted.', 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
   // ---------------- BOOKING & TOKENS ----------------
   const handleBookClassSubmit = async (classId) => {
     try {
@@ -197,6 +229,7 @@ const handlePurchaseTokensSubmit = async (amount) => {
               onUpdateClass={handleUpdateClassSubmit}
               onLogout={handleLogout}
               onViewClass={handleViewClass}
+              onViewUser={handleViewUser}
               onViewChange={() => navigate('/calendar')}
             />
           }
@@ -239,6 +272,22 @@ const handlePurchaseTokensSubmit = async (amount) => {
                 tokens={tokens}
                 onSave={handleUpdateClassSubmit}
                 onDelete={handleDeleteClassSubmit}
+                onBack={() => navigate('/admin')}
+              />
+            ) : <Navigate to="/admin" />
+          }
+        />
+
+        <Route
+          path="/user-edit"
+          element={
+            selectedUser ? (
+              <UserEditView
+                user={selectedUser}
+                bookings={bookings}
+                tokens={tokens}
+                onSave={handleUpdateUserSubmit}
+                onDelete={handleDeleteUserSubmit}
                 onBack={() => navigate('/admin')}
               />
             ) : <Navigate to="/admin" />

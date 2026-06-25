@@ -4,7 +4,7 @@ import { LogOut, Calendar, Users, Plus, Trash2, Coins } from 'lucide-react';
 import '../styles/Dashboard.css';
 import { formatDate } from '../utils/helpers';
 
-export default function AdminDashboard({ currentUser, classes, users, bookings, tokens, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass }) {
+export default function AdminDashboard({ currentUser, classes, users, bookings, tokens, onCreateClass, onDeleteClass, onLogout, onViewChange, onViewClass, onViewUser }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newClass, setNewClass] = useState({
         title: '',
@@ -16,6 +16,35 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
         description: '',
         tokenCost: '1'
     });
+
+    const handleExportUsersCSV = () => {
+        const tokenList = Array.isArray(tokens) ? tokens : [];
+        const headers = ['Name', 'Email', 'Phone', 'City', 'Token Balance', 'Bookings', 'Joined'];
+        const rows = users.map(u => {
+            const userBookings = bookings.filter(b => b.userId === u.id).length;
+            const t = tokenList.find(t => t.id === u.id);
+            return [
+                u.name,
+                u.email,
+                u.phone || '',
+                u.city  || '',
+                t?.tokenBalance ?? 0,
+                userBookings,
+                new Date(u.createdAt).toLocaleDateString(),
+            ];
+        });
+        let csv = headers.join(',') + '\n';
+        rows.forEach(r => { csv += r.map(c => `"${c}"`).join(',') + '\n'; });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url;
+        a.download = `clients_${new Date().toISOString().slice(0,10)}.csv`;
+        a.style.visibility = 'hidden';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
 
     const handleCreateClass = async (e) => {
         e.preventDefault();
@@ -296,7 +325,14 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
 
             {/* Client Database */}
             <div className="card">
-                <h2 className="card-title">Client Database</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h2 className="card-title" style={{ margin: 0 }}>Client Database</h2>
+                    {clientUsers.length > 0 && (
+                        <button onClick={handleExportUsersCSV} className="btn btn-secondary">
+                            Export CSV
+                        </button>
+                    )}
+                </div>
                 {clientUsers.length === 0 ? (
                     <p className="text-muted">No clients registered yet.</p>
                 ) : (
@@ -318,7 +354,12 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                                     const userBookings = bookings.filter(b => b.userId === user.id);
                                     const tokens_peruser = tokens.find(t => t.id === user.id);
                                     return (
-                                        <tr key={user.id}>
+                                        <tr
+                                            key={user.id}
+                                            onClick={() => onViewUser && onViewUser(user.id)}
+                                            style={{ cursor: 'pointer' }}
+                                            title={`Click to edit ${user.name}`}
+                                        >
                                             <td style={{ fontWeight: 600 }}>{user.name}</td>
                                             <td>{user.email}</td>
                                             <td>{user.phone}</td>

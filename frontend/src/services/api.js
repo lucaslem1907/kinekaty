@@ -129,6 +129,29 @@ export const fetchUsers = async () => {
   return res.json();
 };
 
+export const updateUser = async (id, data) => {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/users/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to update user');
+  return json;
+};
+
+export const deleteUser = async (id) => {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/users/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Failed to delete user');
+  return json;
+};
+
 // ---------------- TOKENS ----------------
 export const fetchTokens = async (isAdmin) => {
   const token = getToken();

@@ -14,6 +14,15 @@ public record RegisterRequest(
 
 public record LoginRequest(string Email, string Password, bool IsAdmin = false);
 
+public record UpdateUserRequest(
+    string? Name,
+    string? Email,
+    string? Phone,
+    string? Street,
+    int?    Number,
+    string? City
+);
+
 public record AuthResponse(string Token, UserDto User);
 
 public record UserDto(
