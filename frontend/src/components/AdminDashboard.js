@@ -52,13 +52,12 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
     const clientUsers = users.filter(u => !u.isAdmin);
 
     const sum_tokens = () => {
+        const list = Array.isArray(tokens) ? tokens : [];
         let sum = 0;
-        for (let i = 0; i < tokens.length; i++) {
-            sum += tokens[i].tokenBalance;
+        for (let i = 0; i < list.length; i++) {
+            sum += list[i].tokenBalance;
         };
-        console.log("total tokens: ", sum);
-        return sum
-
+        return sum;
     }
     const total = sum_tokens()
 

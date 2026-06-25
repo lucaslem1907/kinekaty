@@ -121,6 +121,8 @@ export default function ClassBookingApp() {
     try {
       const booking = await bookClass(classId, currentUser.id, currentUser.name);
       setBookings(prev => [...prev, booking]);
+      const updatedTokens = await fetchTokens(currentUser.isAdmin);
+      setTokens(updatedTokens);
       showToast('Booking confirmed!', 'success');
     } catch (err) {
       showToast(err.message, 'error');

@@ -14,7 +14,8 @@ export default function ClassEditView({ classes, users, bookings, tokens, onSave
 
 
   const tokensByUserId = {};
-  tokens.forEach(t => {
+  const tokenList = Array.isArray(tokens) ? tokens : [];
+  tokenList.forEach(t => {
     tokensByUserId[t.id] = t;
   });
   console.log("tokensByUserId: ", tokensByUserId);

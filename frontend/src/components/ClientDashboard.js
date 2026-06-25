@@ -149,7 +149,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                         <button className="btn btn-secondary btn-block" disabled>
                           Class Full
                         </button>
-                      ) : currentUser.tokens < cls.tokenCost ? (
+                      ) : (tokens.totalTokens ?? 0) < cls.tokenCost ? (
                         <button className="btn btn-danger btn-block" disabled>
                           Not Enough Tokens
                         </button>
@@ -222,7 +222,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                             <button className="btn btn-success" disabled>✓ Booked</button>
                           ) : isFull ? (
                             <button className="btn btn-secondary" disabled>Full</button>
-                          ) : currentUser.tokens < cls.tokenCost ? (
+                          ) : (tokens.totalTokens ?? 0) < cls.tokenCost ? (
                             <button className="btn btn-danger" disabled>No Tokens</button>
                           ) : (
                             <button onClick={() => handleBookClass(cls.id)} className="btn btn-primary">
