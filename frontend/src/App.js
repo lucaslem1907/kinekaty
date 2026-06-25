@@ -49,7 +49,7 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handleLogout
+    const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('token')
     localStorage.removeItem('user');
@@ -127,7 +127,7 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handlePurchaseTokensSubmit
+const handlePurchaseTokensSubmit = async (amount) => {
     try {
       await purchaseTokens(amount);
       const updatedTokens = await fetchTokens(currentUser.isAdmin);
