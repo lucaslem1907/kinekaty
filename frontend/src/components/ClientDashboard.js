@@ -137,9 +137,9 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                           <span className="capacity-value">{classBookings.length}/{cls.capacity}</span>
                         </div>
                         <div className="class-token-cost">
-                          <Coins size={16} />
-                          <span>1 token</span>
-                        </div>
+                           <Coins size={16} />
+                           <span>{cls.tokenCost} token{cls.tokenCost !== 1 ? 's' : ''}</span>
+                         </div>
                       </div>
                       {isBooked ? (
                         <button className="btn btn-success btn-block" disabled>
@@ -149,7 +149,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                         <button className="btn btn-secondary btn-block" disabled>
                           Class Full
                         </button>
-                      ) : currentUser.tokens < 1 ? (
+                      ) : currentUser.tokens < cls.tokenCost ? (
                         <button className="btn btn-danger btn-block" disabled>
                           Not Enough Tokens
                         </button>
@@ -158,7 +158,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                           onClick={() => handleBookClass(cls.id)}
                           className="btn btn-primary btn-block"
                         >
-                          Book Now (1 token)
+                          Book Now ({cls.tokenCost} token{cls.tokenCost !== 1 ? 's' : ''})
                         </button>
                       )}
                     </div>
@@ -222,11 +222,11 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                             <button className="btn btn-success" disabled>✓ Booked</button>
                           ) : isFull ? (
                             <button className="btn btn-secondary" disabled>Full</button>
-                          ) : currentUser.tokens < 1 ? (
+                          ) : currentUser.tokens < cls.tokenCost ? (
                             <button className="btn btn-danger" disabled>No Tokens</button>
                           ) : (
                             <button onClick={() => handleBookClass(cls.id)} className="btn btn-primary">
-                              Book (1 token)
+                              Book ({cls.tokenCost} token{cls.tokenCost !== 1 ? 's' : ''})
                             </button>
                           )}
                         </div>

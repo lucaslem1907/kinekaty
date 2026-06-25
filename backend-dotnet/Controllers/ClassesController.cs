@@ -35,7 +35,8 @@ public class ClassesController(AppDbContext db) : ControllerBase
             Time        = req.Time,
             Duration    = req.Duration,
             Location    = req.Location,
-            Capacity    = req.Capacity
+            Capacity    = req.Capacity,
+            TokenCost   = req.TokenCost
         };
         db.Classes.Add(cls);
         await db.SaveChangesAsync();
@@ -58,6 +59,7 @@ public class ClassesController(AppDbContext db) : ControllerBase
         if (req.Duration.HasValue)       cls.Duration    = req.Duration.Value;
         if (req.Location is not null)    cls.Location    = req.Location;
         if (req.Capacity.HasValue)       cls.Capacity    = req.Capacity.Value;
+        if (req.TokenCost.HasValue)      cls.TokenCost   = req.TokenCost.Value;
 
         await db.SaveChangesAsync();
         return Ok(ToDto(cls));
@@ -77,5 +79,5 @@ public class ClassesController(AppDbContext db) : ControllerBase
 
     private static ClassDto ToDto(Class c) => new(
         c.Id, c.Title, c.Description, c.Date, c.Time,
-        c.Duration, c.Location, c.Capacity, c.Bookings.Count, c.CreatedAt);
+        c.Duration, c.Location, c.Capacity, c.TokenCost, c.Bookings.Count, c.CreatedAt);
 }

@@ -7,7 +7,8 @@ public record CreateClassRequest(
     string Time,
     int Duration,
     string Location,
-    int Capacity
+    int Capacity,
+    int TokenCost = 1
 );
 
 public record UpdateClassRequest(
@@ -17,7 +18,8 @@ public record UpdateClassRequest(
     string? Time,
     int? Duration,
     string? Location,
-    int? Capacity
+    int? Capacity,
+    int? TokenCost
 );
 
 public record ClassDto(
@@ -29,6 +31,7 @@ public record ClassDto(
     int Duration,
     string Location,
     int Capacity,
+    int TokenCost,
     int BookingsCount,
     DateTime CreatedAt
 );
