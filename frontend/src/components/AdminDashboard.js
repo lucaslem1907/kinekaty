@@ -352,7 +352,7 @@ export default function AdminDashboard({ currentUser, classes, users, bookings, 
                             <tbody>
                                 {clientUsers.map((user) => {
                                     const userBookings = bookings.filter(b => b.userId === user.id);
-                                    const tokens_peruser = tokens.find(t => t.id === user.id);
+                                    const tokens_peruser = Array.isArray(tokens) ? tokens.find(t => t.id === user.id) : undefined;
                                     return (
                                         <tr
                                             key={user.id}
