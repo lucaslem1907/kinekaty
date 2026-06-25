@@ -49,7 +49,7 @@ export default function ClassBookingApp() {
     }
   };
 
-  const handleLogout
+    const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('token')
     localStorage.removeItem('user');
