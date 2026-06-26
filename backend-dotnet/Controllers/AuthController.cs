@@ -4,6 +4,7 @@ using System.Text;
 using KinekatyApi.Data;
 using KinekatyApi.DTOs;
 using KinekatyApi.Models;
+using KinekatyApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace KinekatyApi.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(AppDbContext db, IConfiguration config) : ControllerBase
+public class AuthController(AppDbContext db, IConfiguration config, IEmailService emailService) : ControllerBase
 {
     // POST /api/auth/register
     [HttpPost("register")]
@@ -36,6 +37,8 @@ public class AuthController(AppDbContext db, IConfiguration config) : Controller
 
         db.Users.Add(user);
         await db.SaveChangesAsync();
+
+        _ = emailService.SendWelcomeEmailAsync(user.Email, user.Name);
 
         return Created($"/api/auth/{user.Id}", new
         {
