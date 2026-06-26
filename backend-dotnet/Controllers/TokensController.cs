@@ -79,6 +79,29 @@ public class TokensController(AppDbContext db) : ControllerBase
         return Ok(summary);
     }
 
+    // POST /api/tokens/grant  — admin manually adds tokens to a client
+    [HttpPost("grant")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> GrantTokens([FromBody] GrantTokensRequest req)
+    {
+        if (req.Amount <= 0) return BadRequest(new { error = "Amount must be greater than 0" });
+
+        var user = await db.Users.FindAsync(req.UserId);
+        if (user is null) return NotFound(new { error = "User not found" });
+
+        var tx = new TokenTransaction
+        {
+            UserId = req.UserId,
+            Amount = req.Amount,
+            Type   = string.IsNullOrWhiteSpace(req.Note) ? "manual" : $"manual:{req.Note}"
+        };
+        db.TokenTransactions.Add(tx);
+        await db.SaveChangesAsync();
+
+        var newBalance = await GetBalance(req.UserId);
+        return Ok(new { message = $"{req.Amount} token(s) granted to {user.Name}.", balance = newBalance, transaction = ToDto(tx) });
+    }
+
     private async Task<int> GetBalance(int userId) =>
         await db.TokenTransactions
             .Where(t => t.UserId == userId)

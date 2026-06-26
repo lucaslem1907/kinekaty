@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { ArrowLeft, Save, X, Trash2, Mail, Phone, MapPin, User, Coins, Calendar, Edit2 } from 'lucide-react';
 import '../styles/UserEdit.css';
 
-export default function UserEditView({ user, bookings, tokens, onSave, onDelete, onBack }) {
+export default function UserEditView({ user, bookings, tokens, onSave, onDelete, onGrantTokens, onBack }) {
   const [isEditing, setIsEditing]   = useState(false);
   const [edited, setEdited]         = useState({ ...user });
   const [activeTab, setActiveTab]   = useState('details');
+  const [grantAmount, setGrantAmount] = useState('');
+  const [grantNote, setGrantNote]     = useState('');
 
   const tokenList    = Array.isArray(tokens) ? tokens : [];
   const tokenEntry   = tokenList.find(t => t.id === user.id);
@@ -135,6 +137,9 @@ export default function UserEditView({ user, bookings, tokens, onSave, onDelete,
         </button>
         <button className={`user-tab ${activeTab === 'bookings' ? 'user-tab-active' : ''}`} onClick={() => setActiveTab('bookings')}>
           Bookings ({userBookings.length})
+        </button>
+        <button className={`user-tab ${activeTab === 'tokens'   ? 'user-tab-active' : ''}`} onClick={() => setActiveTab('tokens')}>
+          Tokens ({tokenBalance})
         </button>
       </div>
 
@@ -280,6 +285,63 @@ export default function UserEditView({ user, bookings, tokens, onSave, onDelete,
           )}
         </div>
       )}
-    </div>
-  );
-}
+          {activeTab === 'tokens' && (
+            <div className="card tab-content">
+              <h2 className="section-title">Token Management</h2>
+              <div className="user-stats" style={{ marginBottom: '24px' }}>
+                <div className="stat-card">
+                  <div className="stat-value">{tokenBalance}</div>
+                  <div className="stat-label">Current Balance</div>
+                </div>
+              </div>
+
+              {onGrantTokens && (
+                <>
+                  <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Manually add tokens</h3>
+                  <p style={{ fontSize: '13px', color: '#718096', marginBottom: '16px' }}>
+                    Use this to credit tokens for cash payments or other off-platform transactions.
+                  </p>
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const amount = parseInt(grantAmount, 10);
+                      if (!amount || amount <= 0) return;
+                      await onGrantTokens(user.id, amount, grantNote);
+                      setGrantAmount('');
+                      setGrantNote('');
+                    }}
+                  >
+                    <div className="form-group">
+                      <label className="form-label">Number of tokens</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        min="1"
+                        value={grantAmount}
+                        onChange={e => setGrantAmount(e.target.value)}
+                        required
+                        style={{ maxWidth: '160px' }}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Note (optional)</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="e.g. cash payment, promo"
+                        value={grantNote}
+                        onChange={e => setGrantNote(e.target.value)}
+                        style={{ maxWidth: '320px' }}
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-primary">
+                      <Coins size={14} /> Add tokens
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }

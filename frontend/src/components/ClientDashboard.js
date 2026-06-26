@@ -57,10 +57,10 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
             <p className="token-value">{tokens === null ? '…' : tokens.totalTokens ?? 0}</p>
           </div>
         </div>
-        <button onClick={() => setView('buy-tokens')} className="btn btn-success">
+        {/*<button onClick={() => setView('buy-tokens')} className="btn btn-success">
           <ShoppingCart size={18} />
           Buy More Tokens
-        </button>
+        </button>*/}
       </div>
 
       {/* Booking Message */}
@@ -256,7 +256,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
               <p className="text-muted">You haven't booked any classes yet. Browse available classes to get started!</p>
             ) : (
               <div className="bookings-list">
-            {bookings.filter(e => e.Date > new Date().toISOString().split('T')[0]).map(booking => {
+            {bookings.map(booking => {
                   const cls = classes.find(c => c.id === booking.classId);
                   if (!cls) return null;
 
@@ -268,12 +268,12 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                   const canCancel    = hoursUntil > 48;
                   const isPast       = hoursUntil < 0;
 
+                  if (isPast) return null;
+
                   return (
                     <div key={booking.id} className="booking-card">
                       <div className="booking-status">
-                        <span className={`badge ${isPast ? 'badge-secondary' : 'badge-success'}`}>
-                          {isPast ? 'Past' : 'Confirmed'}
-                        </span>
+                        <span className="badge badge-success">Confirmed</span>
                       </div>
                       <h3 className="class-title">{cls.title}</h3>
                       <p className="class-description">{cls.description}</p>
@@ -289,8 +289,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                         <span className="token-used">
                           <Coins size={14} /> {cls.tokenCost} token{cls.tokenCost !== 1 ? 's' : ''} used
                         </span>
-                        {!isPast && (
-                          canCancel ? (
+                        {canCancel ? (
                             <button
                               className="btn btn-danger"
                               style={{ fontSize: '12px', padding: '4px 10px' }}

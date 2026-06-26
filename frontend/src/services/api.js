@@ -164,6 +164,21 @@ export const purchaseTokens = async (amount) => {
   return data;
 };
 
+export const grantTokens = async (userId, amount, note) => {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/tokens/grant`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ userId, amount, note }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to grant tokens');
+  return data;
+};
+
 export const buyTokens = async (userId, amount, tokens) => {
     const token = getToken();
     const res = await fetch(`${API_URL}/payment/createsession`, {

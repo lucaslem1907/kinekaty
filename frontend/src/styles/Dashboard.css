@@ -211,9 +211,10 @@
 
 /* Class List View */
 .class-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    display: flex;
+    flex-direction: column;
+    column-count: 2;
+    gap: 16px;
 }
 
 .class-list-item {

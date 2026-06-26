@@ -23,7 +23,8 @@ import {
   cancelBooking,
   purchaseTokens,
   updateUser,
-  deleteUser
+  deleteUser,
+  grantTokens
 } from './services/api';
 import './styles/App.css';
 
@@ -190,6 +191,17 @@ const handlePurchaseTokensSubmit = async (amount) => {
     }
   };
 
+  const handleGrantTokensSubmit = async (userId, amount, note) => {
+    try {
+      await grantTokens(userId, amount, note);
+      const updatedTokens = await fetchTokens(true);
+      setTokens(updatedTokens);
+      showToast(`${amount} token(s) added successfully.`, 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
   // ---------------- PROTECTED ROUTES ----------------
   useEffect(() => {
     const protectedPaths = ['/admin', '/client', '/calendar', '/class-edit'];
@@ -308,6 +320,7 @@ const handlePurchaseTokensSubmit = async (amount) => {
                 tokens={tokens}
                 onSave={handleUpdateUserSubmit}
                 onDelete={handleDeleteUserSubmit}
+                onGrantTokens={handleGrantTokensSubmit}
                 onBack={() => navigate('/admin')}
               />
             ) : <Navigate to="/admin" />
