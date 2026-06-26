@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using KinekatyApi.Data;
+using KinekatyApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -67,6 +68,7 @@ builder.Services.AddCors(options =>
               .AllowCredentials()));
 
 // -- Controllers + Swagger --
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
         o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);

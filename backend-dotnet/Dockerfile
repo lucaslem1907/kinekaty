@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
 COPY *.csproj .
-RUN dotnet restore
+RUN dotnet restore --no-cache
 
 COPY . .
 RUN dotnet publish -c Release -o /app/publish --no-restore
