@@ -285,63 +285,65 @@ export default function UserEditView({ user, bookings, tokens, onSave, onDelete,
           )}
         </div>
       )}
-          {activeTab === 'tokens' && (
-            <div className="card tab-content">
-              <h2 className="section-title">Token Management</h2>
-              <div className="user-stats" style={{ marginBottom: '24px' }}>
-                <div className="stat-card">
-                  <div className="stat-value">{tokenBalance}</div>
-                  <div className="stat-label">Current Balance</div>
-                </div>
-              </div>
 
-              {onGrantTokens && (
-                <>
-                  <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Manually add tokens</h3>
-                  <p style={{ fontSize: '13px', color: '#718096', marginBottom: '16px' }}>
-                    Use this to credit tokens for cash payments or other off-platform transactions.
-                  </p>
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      const amount = parseInt(grantAmount, 10);
-                      if (!amount || amount <= 0) return;
-                      await onGrantTokens(user.id, amount, grantNote);
-                      setGrantAmount('');
-                      setGrantNote('');
-                    }}
-                  >
-                    <div className="form-group">
-                      <label className="form-label">Number of tokens</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        min="1"
-                        value={grantAmount}
-                        onChange={e => setGrantAmount(e.target.value)}
-                        required
-                        style={{ maxWidth: '160px' }}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Note (optional)</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="e.g. cash payment, promo"
-                        value={grantNote}
-                        onChange={e => setGrantNote(e.target.value)}
-                        style={{ maxWidth: '320px' }}
-                      />
-                    </div>
-                    <button type="submit" className="btn btn-primary">
-                      <Coins size={14} /> Add tokens
-                    </button>
-                  </form>
-                </>
-              )}
+      {/* Tokens tab */}
+      {activeTab === 'tokens' && (
+        <div className="card tab-content">
+          <h2 className="section-title">Token Management</h2>
+          <div className="user-stats" style={{ marginBottom: '24px' }}>
+            <div className="stat-card">
+              <div className="stat-value">{tokenBalance}</div>
+              <div className="stat-label">Current Balance</div>
             </div>
+          </div>
+
+          {onGrantTokens && (
+            <>
+              <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Manually add tokens</h3>
+              <p style={{ fontSize: '13px', color: '#718096', marginBottom: '16px' }}>
+                Use this to credit tokens for cash payments or other off-platform transactions.
+              </p>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const amount = parseInt(grantAmount, 10);
+                  if (!amount || amount <= 0) return;
+                  await onGrantTokens(user.id, amount, grantNote);
+                  setGrantAmount('');
+                  setGrantNote('');
+                }}
+              >
+                <div className="form-group">
+                  <label className="form-label">Number of tokens</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    min="1"
+                    value={grantAmount}
+                    onChange={e => setGrantAmount(e.target.value)}
+                    required
+                    style={{ maxWidth: '160px' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Note (optional)</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="e.g. cash payment, promo"
+                    value={grantNote}
+                    onChange={e => setGrantNote(e.target.value)}
+                    style={{ maxWidth: '320px' }}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary">
+                  <Coins size={14} /> Add tokens
+                </button>
+              </form>
+            </>
           )}
         </div>
-      );
-    }
+      )}
+    </div>
+  );
+}
