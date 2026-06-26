@@ -9,7 +9,7 @@ public class SmtpEmailService(IConfiguration config, ILogger<SmtpEmailService> l
     public async Task SendWelcomeEmailAsync(string toEmail, string toName)
     {
         var host     = config["Smtp__Host"]     ?? config["Smtp:Host"];
-        var portStr  = config["Smtp__Port"]     ?? config["Smtp:Port"] ?? "587";
+        var portStr  = config["Smtp__Port"]     ?? config["Smtp:Port"] ?? "465";
         var user     = config["Smtp__User"]     ?? config["Smtp:User"];
         var pass     = config["Smtp__Pass"]     ?? config["Smtp:Pass"];
         var fromName = config["Smtp__FromName"] ?? config["Smtp:FromName"] ?? "Kinekaty";
@@ -53,7 +53,7 @@ public class SmtpEmailService(IConfiguration config, ILogger<SmtpEmailService> l
         try
         {
             using var client = new SmtpClient();
-            await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
+            await client.ConnectAsync(host, port, SecureSocketOptions.SslOnConnect);
             await client.AuthenticateAsync(user, pass);
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
