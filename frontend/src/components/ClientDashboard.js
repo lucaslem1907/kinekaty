@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, Calendar, Clock, MapPin, Coins, Search, ShoppingCart } from 'lucide-react';
+import { LogOut, Calendar, Clock, MapPin, Coins, Search, /*ShoppingCart*/ } from 'lucide-react';
 import { formatDate, formatTime, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
 import '../styles/Dashboard.css';
 
@@ -303,10 +303,10 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                             </button>
                           ) : (
                             <span className="text-muted" style={{ fontSize: '12px' }}>
-                              ⚠ Cannot cancel — less than 48h before class
+                              Cannot cancel &mdash; less than 48h before class
                             </span>
                           )
-                        )}
+                        }
                       </div>
                     </div>
                   );
