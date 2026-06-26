@@ -385,7 +385,7 @@ export default function ClientDashboard({ currentUser, classes, bookings, tokens
                 <p className="text-muted">No booked classes found.</p>
               ) : (
                 <div className="bookings-list">
-                  {bookings.map(booking => {
+                  {bookings.filter(e => e.Date > new Date().toISOString().split('T')[0] && e.Time > new Date().toISOString().split('T')[1]).map(booking => {
                     const cls = classes.find(c => c.id === booking.classId && c.date < new Date().toISOString().split('T')[0]);
                     if (!cls) return null;
                     return (
