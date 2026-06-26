@@ -8,17 +8,21 @@ public class SmtpEmailService(IConfiguration config, ILogger<SmtpEmailService> l
 {
     public async Task SendWelcomeEmailAsync(string toEmail, string toName)
     {
-        var host     = config["Smtp:Host"];
-        var port     = int.Parse(config["Smtp:Port"] ?? "587");
-        var user     = config["Smtp:User"];
-        var pass     = config["Smtp:Pass"];
-        var fromName = config["Smtp:FromName"] ?? "Kinekaty";
+        var host     = config["Smtp__Host"]     ?? config["Smtp:Host"];
+        var portStr  = config["Smtp__Port"]     ?? config["Smtp:Port"] ?? "587";
+        var user     = config["Smtp__User"]     ?? config["Smtp:User"];
+        var pass     = config["Smtp__Pass"]     ?? config["Smtp:Pass"];
+        var fromName = config["Smtp__FromName"] ?? config["Smtp:FromName"] ?? "Kinekaty";
+        var port     = int.Parse(portStr);
 
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass))
         {
-            logger.LogWarning("SMTP not configured — skipping welcome email for {Email}", toEmail);
+            logger.LogWarning("SMTP not configured — skipping welcome email for {Email}. host={Host} user={User} passSet={PassSet}",
+                toEmail, host ?? "null", user ?? "null", !string.IsNullOrWhiteSpace(pass));
             return;
         }
+
+        logger.LogInformation("Sending welcome email via {Host}:{Port} as {User}", host, port, user);
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(fromName, user));
