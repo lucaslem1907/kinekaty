@@ -292,29 +292,22 @@ export default function UserEditView({ user, bookings, tokens, onSave, onDelete,
         <div className="card tab-content">
           <h2 className="section-title">Token Management</h2>
 
-          {/* Current balance highlight */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '16px',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            borderRadius: '12px', padding: '20px 24px', marginBottom: '28px', color: '#fff'
-          }}>
-            <Coins size={36} style={{ opacity: 0.9 }} />
+          <div className="token-balance-banner">
+            <Coins size={36} className="token-balance-icon" />
             <div>
-              <div style={{ fontSize: '32px', fontWeight: 700, lineHeight: 1 }}>{tokenBalance}</div>
-              <div style={{ fontSize: '13px', opacity: 0.85, marginTop: '4px' }}>tokens available</div>
+              <div className="token-balance-value">{tokenBalance}</div>
+              <div className="token-balance-label">tokens available</div>
             </div>
           </div>
 
           {onGrantTokens && (
-            <div style={{
-              background: '#f7fafc', border: '1px solid #e2e8f0',
-              borderRadius: '10px', padding: '20px 24px'
-            }}>
-              <h3 style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: 600 }}>Manually add tokens</h3>
-              <p style={{ fontSize: '13px', color: '#718096', margin: '0 0 20px' }}>
+            <div className="grant-tokens-box">
+              <h3 className="section-subtitle">Manually add tokens</h3>
+              <p className="info-label" style={{ marginBottom: '16px' }}>
                 Credit tokens for cash payments or other off-platform transactions.
               </p>
               <form
+                className="grant-tokens-form"
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const amount = parseInt(grantAmount, 10);
@@ -328,27 +321,25 @@ export default function UserEditView({ user, bookings, tokens, onSave, onDelete,
                     setIsGranting(false);
                   }
                 }}
-                style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
               >
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                  <div className="form-group" style={{ margin: 0 }}>
+                <div className="form-row">
+                  <div className="form-group">
                     <label className="form-label">Number of tokens</label>
                     <input
                       type="number"
-                      className="form-control"
+                      className="form-input grant-amount-input"
                       min="1"
                       value={grantAmount}
                       onChange={e => setGrantAmount(e.target.value)}
                       required
                       disabled={isGranting}
-                      style={{ width: '120px' }}
                     />
                   </div>
-                  <div className="form-group" style={{ margin: 0, flex: 1 }}>
+                  <div className="form-group">
                     <label className="form-label">Note (optional)</label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-input"
                       placeholder="e.g. cash payment, promo"
                       value={grantNote}
                       onChange={e => setGrantNote(e.target.value)}
@@ -356,27 +347,17 @@ export default function UserEditView({ user, bookings, tokens, onSave, onDelete,
                     />
                   </div>
                 </div>
-                <div>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isGranting || !grantAmount}
-                    style={{ minWidth: '140px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
-                  >
-                    {isGranting ? (
-                      <>
-                        <span style={{
-                          width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.4)',
-                          borderTopColor: '#fff', borderRadius: '50%',
-                          display: 'inline-block', animation: 'spin 0.7s linear infinite'
-                        }} />
-                        Adding...
-                      </>
-                    ) : (
-                      <><Coins size={14} /> Add tokens</>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="btn btn-primary grant-submit-btn"
+                  disabled={isGranting || !grantAmount}
+                >
+                  {isGranting ? (
+                    <><span className="btn-spinner" /> Adding...</>
+                  ) : (
+                    <><Coins size={14} /> Add tokens</>
+                  )}
+                </button>
               </form>
             </div>
           )}

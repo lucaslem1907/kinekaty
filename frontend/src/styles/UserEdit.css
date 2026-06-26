@@ -177,3 +177,55 @@
   border-radius: 8px;
   font-size: 14px;
 }
+
+/* Token balance banner */
+.token-balance-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.token-balance-icon { opacity: 0.9; }
+.token-balance-value { font-size: 32px; font-weight: 700; line-height: 1; }
+.token-balance-label { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+/* Grant tokens box */
+.grant-tokens-box {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+
+.grant-tokens-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.grant-amount-input { width: 120px; }
+
+.grant-submit-btn {
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
