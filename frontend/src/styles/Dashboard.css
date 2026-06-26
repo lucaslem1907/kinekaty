@@ -211,9 +211,8 @@
 
 /* Class List View */
 .class-list {
-    display: flex;
-    flex-direction: column;
-    column-count: 2;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
 }
 
@@ -432,6 +431,10 @@
   }
 
   .class-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .class-list {
     grid-template-columns: 1fr;
   }
 

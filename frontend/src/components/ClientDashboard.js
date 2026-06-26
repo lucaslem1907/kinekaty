@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, Calendar, Clock, MapPin, Coins, Search, /*ShoppingCart*/ } from 'lucide-react';
+import { LogOut, Calendar, Clock, MapPin, Coins, Search } from 'lucide-react';
 import { formatDate, formatTime, TOKEN_PACKAGES, getPricePerToken } from '../utils/helpers';
 import '../styles/Dashboard.css';
 
